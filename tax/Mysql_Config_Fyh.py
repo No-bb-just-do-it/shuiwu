@@ -1,12 +1,13 @@
 # coding=utf-8
 import os
-import MySQLdb
+# import MySQLdb
+import mysql.connector
 import time
 
 
 def my_conn(db_no):
     dbs = ['taxplayer', 'job_info']
-    conn = MySQLdb.connect(host='172.16.0.76', port=3306, user='fengyuanhua', passwd='!@#qweASD', db=dbs[db_no],
+    conn = mysql.connector.connect(host='172.16.0.76', port=3306, user='fengyuanhua', passwd='!@#qweASD', db=dbs[db_no],
                            charset='utf8')
     return conn
 
@@ -47,7 +48,7 @@ def logger(log_name, message):
     today = time.strftime('%Y-%m-%d')
     write_time = time.strftime('%H:%M:%S')
     log_directory = os.path.join(parent_dir, today)
-    log_path = log_directory + '\\' + log_name
+    log_path = os.path.join(log_directory , log_name)
     if type(message) == unicode:
         message = message.encode('utf8')
     # log_directory = log_name.replace(log_name.split('\\')[-1], '')
