@@ -143,8 +143,8 @@ class TaxplayerReader(object):
         :return:
         """
         parent_dir = os.path.join(os.path.dirname(__file__), '../logs/readerlogs')
-        # today = time.strftime('%Y-%m-%d')
-        today = '2017-11-29'
+        today = time.strftime('%Y-%m-%d')
+        # today = '2017-11-29'
         write_time = time.strftime('%H:%M:%S')
         log_directory = os.path.join(parent_dir, today)
         if not os.path.exists(log_directory):
