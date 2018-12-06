@@ -23,7 +23,8 @@ class TaxplayerReader(object):
         self.abnormal_fields = []
         self.qs_fields = []
         # self.today = "'%2017-09-08%'"
-        self.today = "'%" + time.strftime('%Y-%m-%d') + "%'"
+        # self.today = "'%" + time.strftime('%Y-%m-%d') + "%'"
+        self.today = "'%2018-12-%'"
         self.last_update_time = time.strftime('%Y-%m-%d %H:%M:%S')
         self.fieldnames_directory = self.get_fieldnames_directory()
         self.row = -1
@@ -234,9 +235,8 @@ class TaxplayerReader(object):
         """
         print sql
         info = []
-        nums = self.cursor.execute(sql)
-        if nums:
-            info = self.cursor.fetchmany(nums)
+        self.cursor.execute(sql)
+        info = self.cursor.fetchall()
         return info
 
     # 以下到excel_reader()的函数用来解析excel
@@ -319,11 +319,11 @@ class TaxplayerReader(object):
         :return:
         """
         print sql
-        nums = self.cursor.execute(sql)
-        print nums
+        self.cursor.execute(sql)
+
         # break
-        if nums:
-            info = self.cursor.fetchmany(nums)
+        if True:
+            info = self.cursor.fetch(all)
             if os.path.isfile(savepath) and row_num == -1:
                 os.remove(savepath)
                 f = xlwt.Workbook(encoding='utf-8')
@@ -342,7 +342,7 @@ class TaxplayerReader(object):
                 else:
                     sheet = f.add_sheet('fieldnames' + str(t), cell_overwrite_ok=True)
                     sheet.write(row, 0, 'excel')
-                for n in range(0, nums):
+                for n in range(0, len(info)):
                     filepath = file_directory + info[n][4]
                     try:
                         excel = self.get_excel(filepath)
@@ -869,10 +869,12 @@ class TaxplayerReader(object):
         """
         self.get_directory(save_directory)
         print sql
-        nums = self.cursor.execute(sql)  # 返回符合条件的总数表
-        self.log('num_info:' + str(nums))
-        info = self.cursor.fetchmany(nums)
-        for n in range(0, nums):
+        self.cursor.execute(sql)  # 返回符合条件的总数表
+        info = self.cursor.fetchall()
+        self.log('num_info:' + str(len(info)))
+        if info == None:
+            return None
+        for n in range(0, len(info)):
             w = win32com.client.Dispatch('Word.Application')
             filepath = file_directory + info[n][4]
             if os.path.isfile(filepath):
@@ -1011,11 +1013,11 @@ class TaxplayerReader(object):
         :param row_num: 写入sheet表的当前行
         :return:
         """
-        nums = self.cursor.execute(sql)
+        self.cursor.execute(sql)
+        info = self.cursor.fetchall()
         print sql
-        print nums
-        if nums:
-            info = self.cursor.fetchmany(nums)
+        print len(info)
+        if len(info):
             if os.path.isfile(savepath):
                 rb = xlrd.open_workbook(savepath)
                 f = copy(rb)
@@ -1031,7 +1033,7 @@ class TaxplayerReader(object):
                 else:
                     sheet = f.add_sheet('fieldnames' + str(t), cell_overwrite_ok=True)
                     sheet.write(row, 0, 'html')
-                for n in range(0, nums):
+                for n in range(0, len(info)):
                     # print n + 1, '111111'
                     row += 1
                     province = info[n][0]

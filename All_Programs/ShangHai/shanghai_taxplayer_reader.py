@@ -24,7 +24,7 @@ class AnHuiTaxplayerReader(TaxplayerReader):
         fields = list()
         sql = "SELECT * from taxplayer_filename where title like '%非正常户%' and filename like '%.xls%' " \
               "and province = '" + self.province.encode('utf8') + "' and last_update_time like " + self.today
-        self.log(sql)
+        # self.log(sql)1
         info = self.get_province_info(sql)
         num_sql_all, num_repetition_all, num_fail_all = 0, 0, 0
         for num_info in range(0, len(info)):
