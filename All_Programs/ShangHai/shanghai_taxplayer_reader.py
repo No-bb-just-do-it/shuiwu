@@ -7,6 +7,9 @@ import time
 import bs4
 import re
 
+project = 'shuiwu'
+sys.path.append(os.getcwd().split(project)[0] + project)
+
 
 class AnHuiTaxplayerReader(TaxplayerReader):
     def __init__(self):
