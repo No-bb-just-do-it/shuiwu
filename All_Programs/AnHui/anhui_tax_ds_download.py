@@ -56,6 +56,7 @@ class AnHuiTaxCrawler(TaxplayerDownload):
     def log(self, message):
         log_name = 'an_hui_tax_ds.log'
         logger(log_name, message)
+
     def get_tag_list(self, url, find_tag):
         tag_list = []
         for t in range(5):

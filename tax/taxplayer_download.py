@@ -23,7 +23,7 @@ class TaxplayerDownload(SpiderMan):
         parent_dir = os.path.join(os.path.dirname(__file__), '../All_Files')
         save_directory = os.path.join(parent_dir, province_py)
         self.get_directory(save_directory)
-        return save_directory + '\\'
+        return save_directory
 
     def get_tag_list(self, **kwargs):
         pass
@@ -75,9 +75,12 @@ class TaxplayerDownload(SpiderMan):
             return True
         else:
             return False
+
     # 下载文件
     def download_file(self, download_url, filename, savepath):
-        for k in range(15):
+        # print 'filename ',filename
+        # print 'savepath ',savepath
+        for k in range(5):
             try:
                 fs = self.get(download_url, timeout=15)
                 if fs.status_code == 200:
@@ -94,13 +97,14 @@ class TaxplayerDownload(SpiderMan):
                     with open(savepath, 'wb') as f:
                         f.write(download_url_content)
                     break
-            except:
-                if k == 14:
-                    print u'第二次访问请求尝试结束', download_url
-                    logger('download_url','下载失败')
+            except Exception as e:
+                print e
+                if k == 4:
+                    print u'下载失败:', download_url
+                    # logger('download_url','下载失败')
 
                 else:
-                    print u'第二次访问第' + str(k) + u'次请求尝试'
+                    print u'第' + str(k) + u'次下载请求'
 
     def download_htmlfile(self, r_inner, html_savepath):
         with open(html_savepath, 'wb') as f:
