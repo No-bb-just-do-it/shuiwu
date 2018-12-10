@@ -96,7 +96,7 @@ class HuNan(TaxConfig):
             url_start = 'http://www.%sgtax.gov.cn/%sgtax/article_list_xxgk_fl.jsp' % (pinyin,pinyin)
             url_source = 'http://www.%sgtax.gov.cn/%sgtax/' % (pinyin,pinyin)
             url_host = 'http://www.%sgtax.gov.cn' % pinyin
-            for p in range(50):
+            for p in range(10):
                 self.last_update_time = time.strftime('%Y-%m-%d %H:%M:%S')
                 params = {
                     'pagenum': p,
@@ -105,6 +105,7 @@ class HuNan(TaxConfig):
                 tag_list = self.get_tag_list(url_start,params=params)
                 if not tag_list:
                     print(u'无详情页列表信息，爬虫结束')
+                    break
                 taskList = []
                 self.t = time.strftime('%Y-%m-%d %H:%M:%S')
                 print('page: ',p)
@@ -125,7 +126,7 @@ class HuNan(TaxConfig):
                     tList.append(t)
                 for t in tList:
                     t.start()
-                    t.join()
+                    # t.join()
                 # 通过协程处理每个详情页信息
                 # gevent.joinall(taskList)
                 # break
@@ -155,7 +156,7 @@ class HuNan(TaxConfig):
             if href_inners:
                 for href_inner in href_inners:
                     download_url = url_host + href_inner
-                    self.log('download_url: ' + download_url)
+                    # self.log('download_url: ' + download_url)
                     # print('download_url', download_url)
                     # filter_condition = self.check_download_url(download_url)
                     # if filter_condition:
@@ -183,7 +184,7 @@ class HuNan(TaxConfig):
                     print('url_detail_html ',url_detail)
                     with open(html_savepath, 'w',encoding='utf-8') as f:
                         # print(r_inner.content.decode('gbk'))
-                        f.write(r_inner.content.decode(charset1))
+                        f.write(r_inner.content.decode(charset1,'ignore'))
 
                     self.save_to_mysql(sql,self.log_name)
 

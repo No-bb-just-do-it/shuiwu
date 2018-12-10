@@ -37,10 +37,11 @@ class HuNanTaxCrawler(TaxplayerDownload):
         log_name = 'hu_nan_tax.log'
         logger(log_name, message)
 
-    def get_tag_list(self, num_source, url):
+    def get_tag_list(self, num_source, url,params=None):
         tag_list = []
         for t in range(5):
             r = self.get(url)
+            print r.content
             if r.status_code == 200:
                 r.encoding = 'gbk'
                 res = BeautifulSoup(r.text, 'html5lib')
@@ -71,12 +72,17 @@ class HuNanTaxCrawler(TaxplayerDownload):
                         class_id = self.class_ids[4]
                     else:
                         class_id = self.class_ids[j]
-                    url = 'http://www.%sgtax.gov.cn/%sgtax/article_list.jsp?' \
-                          'pagenum=%s&smallclassid=%s' % (xzqy_py, xzqy_py, str(p), class_id)
+                    # url = 'http://www.%sgtax.gov.cn/%sgtax/article_list.jsp?' \
+                    #       'pagenum=%s&smallclassid=%s' % (xzqy_py, xzqy_py, str(p), class_id)
+                    url = 'http://www.csgtax.gov.cn/csgtax/article_list_xxgk_fl.jsp'
                     self.log(region + '  ' + url)
                     url_source = 'http://www.%sgtax.gov.cn/%sgtax/' % (xzqy_py, xzqy_py)
                     url_host = 'http://www.%sgtax.gov.cn' % xzqy_py
-                    tag_list = self.get_tag_list(num_source, url)
+                    params = {
+                        'pagenum': 0,
+                        'smallclassid': 20180629130174
+                    }
+                    tag_list = self.get_tag_list(num_source, url,params=params)
                     if not tag_list and p > 2:
                         break
                     tasks = []
