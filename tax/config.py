@@ -2,9 +2,16 @@
 import os
 import time
 import mysql.connector
+from tax.SpiderMan import SpiderMan
+from bs4 import BeautifulSoup
+import re
+from codecs import open
+import chardet
 
-class TaxConfig(object):
+class TaxConfig(SpiderMan):
     def __init__(self):
+        super(TaxConfig,self).__init__()
+        self.fbrq_stop = '2018-01-01'
         self.conn = None
         self.cursor = None
         self.my_conn()
@@ -14,8 +21,7 @@ class TaxConfig(object):
                     user='fengyuanhua', passwd='!@#qweASD', db='taxplayer',charset='utf8')
         self.cursor = self.conn.cursor()
 
-
-    def logger(self, log_name, message):
+    def log_read(self, log_name, message):
         """
         记录日志信息
         :param log_name:日志名
@@ -29,7 +35,7 @@ class TaxConfig(object):
         log_directory = os.path.join(parent_dir, today)
         if not os.path.exists(log_directory):
             os.makedirs(log_directory)
-        log_path = log_directory + '\\' + log_name
+        log_path = os.path.join(log_directory,log_name)
         if type(message) == list:
             key = '['
             val = ''
@@ -50,8 +56,119 @@ class TaxConfig(object):
             with open(log_path, 'a') as f:
                 f.write(write_time + '    ' + str(message))
         else:
-            if type(message) == unicode:
+            if type(message) == str:
                 message = message.encode('utf8')
             with open(log_path, 'a') as f:
                 f.write(write_time + '    ' + message + '\n')
 
+    def save_to_mysql(self, sql, log_name = None,num_repeat=3, num_fail=0):
+        """
+        用来将数据插入到mysql数据库，并记录插入异常，另外返回重复次数。
+        :param sql: 插入语句
+        :param num_repeat: 插入语句执行重复条数
+        :param nun_fail：执行sql失败条数
+        """
+        try:
+            self.cursor.execute(sql)
+            self.conn.commit()
+            data_nums = [num_repeat, num_fail]
+            return data_nums
+        except Exception as e:
+            # print('e',e.args)
+            if e.args[0] == 2006:
+                time.sleep(3)
+                data_nums = self.save_to_mysql(sql, num_repeat, num_fail)
+                return data_nums
+            elif e.args[0] != 1062:
+                num_fail += 1
+                print(sql, e)
+                # self.logger(log_name, 'hunan')
+                # self.logger(log_name, str(e[0]))
+                # self.logger(log_name, sql)
+            else:
+                num_repeat += 1
+            data_nums = [num_repeat, num_fail]
+            return data_nums
+
+    # 获得需要保存的html文件名
+    def get_html_filename(self, url_inner):
+        html_filename = url_inner.split('/')[-1]
+        if '=' in url_inner:
+            if '.htm' not in url_inner:
+                html_filename = html_filename.split('=')[-1] + '.html'
+            else:
+                html_filename = html_filename.split('=')[-1]
+        return html_filename
+
+     # 判断链接列表中需要下载的文件的链接，返回链接列表
+    def get_href(self, a_tag_list):
+        href_list = []
+        for a_tag in a_tag_list:
+            soup = BeautifulSoup(a_tag, "html.parser")
+            href = soup.find('a').get('href', ' ')
+            file_formats = ['.doc', '.xls', '.pdf', '.rar', '.DOC']
+            file_condition = True in [file_format in href for file_format in file_formats]
+            if file_condition and 'javascript' not in href:
+                href_list.append(href)
+        return href_list
+
+    def log_download(self,log_name, message):
+        parent_dir = os.path.join(os.path.dirname(__file__), '../logs/downloadlogs')
+        #print('parent_dir', parent_dir)
+        today = time.strftime('%Y-%m-%d')
+        write_time = time.strftime('%H:%M:%S')
+        log_directory = os.path.join(parent_dir, today)
+        log_path = os.path.join(log_directory, log_name)
+        if type(message) == str:
+            message = message.encode('utf8')
+        # log_directory = log_name.replace(log_name.split('\\')[-1], '')
+        if not os.path.exists(log_directory):
+            os.makedirs(log_directory)
+        with open(log_path, 'a',encoding='utf-8') as f:
+            f.write(write_time + '    ' + str(message) + '\n')
+        #print(write_time, '  ', message)
+
+    def get_filename(self, url):
+        filename = url.split('/')[-1]
+        if '=' in filename:
+            filename = filename.split('=')[-1]
+        return filename
+
+    def get_savefile_directory(self, province_py):
+        parent_dir = os.path.join(os.path.dirname(__file__), '../All_Files')
+        save_directory = os.path.join(parent_dir, province_py)
+        if not os.path.exists(save_directory):
+            os.makedirs(save_directory)
+        return save_directory
+
+    # 下载文件
+    def download_file(self, download_url, filename, savepath):
+        #print('filename ',filename)
+        #print('savepath ',savepath)
+        for k in range(5):
+            # try:
+                fs = self.get(download_url, timeout=15)
+                # print(fs)
+                if fs.status_code == 200:
+                    pattern = 'http://.*?' + filename
+                    download_url_news = re.findall(pattern, str(fs.content))
+                    # print('download_url_news',download_url_news)
+                    if download_url_news:
+                        fs_new = self.get(download_url_news[0], timeout=15)
+                        if fs_new.status_code == 200:
+                            download_url_content = fs_new.content
+                        else:
+                            download_url_content = ''
+                    else:
+                        download_url_content = fs.content
+                    with open(savepath, 'wb') as f:
+                        f.write(download_url_content)
+                    break
+            # except Exception as e:
+            #     print(e)
+            #     if k == 4:
+            #         print(u'下载失败:', download_url)
+            #         # logger('download_url','下载失败')
+            #
+            #     else:
+            #         print(u'第' + str(k) + u'次下载请求')

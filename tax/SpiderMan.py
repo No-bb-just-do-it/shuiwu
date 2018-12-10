@@ -3,7 +3,7 @@
 import requests
 import json
 import time
-from MyException import StatusCodeException
+from tax.MyException import StatusCodeException
 
 class SpiderMan(object):
 
@@ -37,13 +37,14 @@ class SpiderMan(object):
             try:
                 if self.session:
                     r = self.session.get(url=url, headers=self.headers,**kwargs)
+                    print(r)
                     if r.status_code != 200:
                         raise StatusCodeException(str(r.status_code))
                 else:
                     r = requests.get(url=url, headers=self.headers,**kwargs)
                     if r.status_code != 200:
                         raise StatusCodeException(str(r.status_code))
-                return r
+                    return r
             except (requests.exceptions.RequestException,StatusCodeException) as e:
                 time.sleep(5)
                 if t == self.max_try_times - 1:
@@ -85,7 +86,7 @@ class SpiderMan(object):
             if domain is not None:
                 params['domain'] = domain
             res = requests.get(url, params=params)
-            # print res.text
+            # print(res.text)
             if res.status_code == 200 and res.text != '{}':
                 json_obj = json.loads(res.text)
                 if self.keep_ip:
@@ -93,14 +94,14 @@ class SpiderMan(object):
                 return json_obj
             else:
                 time.sleep(1)
-                print u'暂无可用代理'
+                print(u'暂无可用代理')
 
     def add_to_black_list(self, domain, proxy_ip):
         params = {'domain': domain, 'proxy_ip': proxy_ip, 'order': self.order}
-        print u'黑名单', params
+        print(u'黑名单', params)
         url = 'http://%s:%d/add-proxy-to-blacklist-api' % (self.manager_host, self.manager_port)
         r = requests.post(url, params=params)
-        # print r.status_code
+        # print(r.status_code)
 
 if __name__ == '__main__':
     order_nbr = '5fe6cf97-5592-11e7-be16-f45c89a63279'
@@ -110,4 +111,4 @@ if __name__ == '__main__':
                     headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0'}
                     )
     r.encoding = 'gbk'
-    print r.text
+    print(r.text)
