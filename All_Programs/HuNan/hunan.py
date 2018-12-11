@@ -12,7 +12,7 @@ import gevent,gevent.monkey
 from codecs import open
 import chardet
 import threading
-gevent.monkey.patch_all()
+# gevent.monkey.patch_all()
 
 
 class HuNan(TaxConfig):
@@ -88,6 +88,45 @@ class HuNan(TaxConfig):
                 # self.cursor.execute(sql)
                 # self.conn.commit()
                 self.save_to_mysql(sql,3,0)
+    #地级市欠税公告
+    def qs_cities(self):
+        for region,pinyin in self.regions.items():
+            url_start = 'http://www.%sgtax.gov.cn/%sgtax/article_list_xxgk_fl.jsp?smallclassid=20091203033151' % (pinyin,pinyin)
+            url_source = 'http://www.%sgtax.gov.cn/%sgtax/' % (pinyin,pinyin)
+            url_host = 'http://www.%sgtax.gov.cn' % pinyin
+            tag_list_before = []
+            print('region: ',region)
+            for p in range(10):
+                self.last_update_time = time.strftime('%Y-%m-%d %H:%M:%S')
+                print('page: ',p)
+                print('time',self.last_update_time)
+                params = {
+                    'pagenum': p,
+                    'smallclassid': 20091203033151
+                    }
+                tag_list = self.get_tag_list(url_start,params=params)
+                if not tag_list or tag_list_before == tag_list:
+                    print(u'无详情页列表信息，爬虫结束')
+                    break
+                tag_list_before = tag_list
+                taskList = []
+                tList = []
+                for num,tag in enumerate(tag_list):
+                    fbrq = tag.find('em').text.strip()
+                    if not fbrq:
+                        continue
+                    if fbrq <= self.fbrq_stop:
+                        self.stop_crawl = True
+                        print(u'发布日期爬取到达设定最早日期')
+                        break
+                    print(tag.text)
+                    parse_tag = self.parse_detail(tag,url_host,url_source,fbrq,region)
+                    t = threading.Thread(target=self.parse_detail, args=(tag,url_host,url_source,fbrq,region))
+                    tList.append(t)
+                for t in tList:
+                    t.start()
+
+
 
     #地级市非正常户
     def abnormal_cities(self):
@@ -97,8 +136,11 @@ class HuNan(TaxConfig):
             url_source = 'http://www.%sgtax.gov.cn/%sgtax/' % (pinyin,pinyin)
             url_host = 'http://www.%sgtax.gov.cn' % pinyin
             tag_list_before = []
+            print('region: ',region)
             for p in range(10):
                 self.last_update_time = time.strftime('%Y-%m-%d %H:%M:%S')
+                print('page: ',p)
+                print('time',self.last_update_time)
                 params = {
                     'pagenum': p,
                     'smallclassid': 20180629130174
@@ -109,9 +151,6 @@ class HuNan(TaxConfig):
                     break
                 tag_list_before = tag_list
                 taskList = []
-                self.t = time.strftime('%Y-%m-%d %H:%M:%S')
-                print('page: ',p)
-                print('time',self.t)
                 tList = []
                 for num,tag in enumerate(tag_list):
                     fbrq = tag.find('em').text.strip()
@@ -124,7 +163,7 @@ class HuNan(TaxConfig):
                     print(tag.text)
                     # parse_tag = self.parse_tag(tag,url_host,url_source,fbrq,region)
                     # taskList.append(gevent.spawn(parse_tag))
-                    t = threading.Thread(target=self.parse_tag, args=(tag,url_host,url_source,fbrq,region))
+                    t = threading.Thread(target=self.parse_detail, args=(tag,url_host,url_source,fbrq,region))
                     tList.append(t)
                 for t in tList:
                     t.start()
@@ -135,11 +174,11 @@ class HuNan(TaxConfig):
             # break
 
     #解析详情页
-    def parse_tag(self, tag,url_host,url_source,fbrq,region):
+    def parse_detail(self, tag,url_host,url_source,fbrq,region):
         a_tag = tag.find('a')
         href = a_tag.get('href')
         url_detail = url_source + href
-        print('url_detail', url_detail)
+        print('url_detail: ',url_detail)
         html_filename = self.get_html_filename(url_detail)
         html_savepath = os.path.join(self.path,html_filename)
         title = a_tag.get('title')
@@ -213,10 +252,9 @@ class HuNan(TaxConfig):
         r = self.get('http://www.hhgtax.gov.cn/hhgtax/article_content_xxgk.jsp?id=20181106283800&smallclassid=20180629130174')
         print(r.content.decode('gbk'))
 
-
-
 if __name__ == '__main__':
     hunan = HuNan()
     # hunan.qs_province()
-    hunan.abnormal_cities()
+    # hunan.abnormal_cities()
+    hunan.qs_cities()
     # hunan.ts()
