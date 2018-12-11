@@ -120,7 +120,7 @@ class HuNan(TaxConfig):
                         print(u'发布日期爬取到达设定最早日期')
                         break
                     print(tag.text)
-                    parse_tag = self.parse_detail(tag,url_host,url_source,fbrq,region)
+                    # parse_tag = self.parse_detail(tag,url_host,url_source,fbrq,region)
                     t = threading.Thread(target=self.parse_detail, args=(tag,url_host,url_source,fbrq,region))
                     tList.append(t)
                 for t in tList:
