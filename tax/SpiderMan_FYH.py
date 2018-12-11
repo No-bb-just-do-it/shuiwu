@@ -40,7 +40,7 @@ class SpiderMan(object):
                     return self.session.get(url=url, **kwargs)
                 else:
                     return requests.get(url=url, **kwargs)
-            except requests.exceptions.RequestException, e:
+            except requests.exceptions.RequestException as e:
                 time.sleep(7)
                 if t == self.max_try_times - 1:
                     raise e
@@ -60,7 +60,7 @@ class SpiderMan(object):
                     return self.session.post(url=url, **kwargs)
                 else:
                     return requests.post(url=url, **kwargs)
-            except requests.exceptions.RequestException, e:
+            except requests.exceptions.RequestException as e:
                 time.sleep(7)
                 if t == self.max_try_times - 1:
                     raise e
@@ -85,11 +85,11 @@ class SpiderMan(object):
                 return json_obj
             else:
                 time.sleep(1)
-                print u'暂无可用代理'
+                print('暂无可用代理')
 
     def add_to_black_list(self, domain, proxy_ip):
         params = {'domain': domain, 'proxy_ip': proxy_ip, 'order': self.order}
-        print u'黑名单', params
+        print('黑名单', params)
         url = 'http://%s:%d/add-proxy-to-blacklist-api' % (self.manager_host, self.manager_port)
         r = requests.post(url, params=params)
         # print r.status_code
@@ -104,4 +104,4 @@ if __name__ == '__main__':
                         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0'}
                     )
     r.encoding = 'gbk'
-    print r.text
+    print(r.text)

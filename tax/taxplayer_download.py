@@ -1,9 +1,9 @@
 # coding=utf-8
-from SpiderMan_FYH import SpiderMan
+from tax.SpiderMan_FYH import SpiderMan
 from bs4 import BeautifulSoup
 import os
 import re
-from Mysql_Config_Fyh import logger
+# from Mysql_Config_Fyh import logger
 
 
 class TaxplayerDownload(SpiderMan):
@@ -98,13 +98,13 @@ class TaxplayerDownload(SpiderMan):
                         f.write(download_url_content)
                     break
             except Exception as e:
-                print e
+                print(e)
                 if k == 4:
-                    print u'下载失败:', download_url
+                    print('下载失败:', download_url)
                     # logger('download_url','下载失败')
 
                 else:
-                    print u'第' + str(k) + u'次下载请求'
+                    print('第' + str(k) + u'次下载请求')
 
     def download_htmlfile(self, r_inner, html_savepath):
         with open(html_savepath, 'wb') as f:

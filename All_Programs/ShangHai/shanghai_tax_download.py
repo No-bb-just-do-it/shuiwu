@@ -5,9 +5,9 @@ import os
 
 project = 'shuiwu'  # 工作项目根目录
 sys.path.append(os.getcwd().split(project)[0] + project)
-# print os.getcwd()
-# print os.getcwd().split(project)
-# print os.getcwd().split(project)[0]+project
+# print(os.getcwd())
+# print(os.getcwd().split(project))
+# print(os.getcwd().split(project)[0]+project)
 
 from tax.SpiderMan import SpiderMan
 from tax.taxplayer_download import TaxplayerDownload
@@ -33,7 +33,7 @@ class ShangHaiTaxplayerCrawler(TaxplayerDownload,SpiderMan):
         self.province = u'上海市'
         self.province_py = 'Shang_Hai'
         self.path = self.get_savefile_directory(self.province_py)
-        print 'self.path ',self.path
+        print('self.path ',self.path)
         self.last_update_time = time.strftime('%Y-%m-%d %H:%M:%S')
         self.order_nbr = '5fe6cf97-5592-11e7-be16-f45c89a63279'
         self.connect = mysql.connector.connect(host='172.16.0.76', port=3306, user='fengyuanhua', passwd='!@#qweASD', db='taxplayer',
@@ -52,7 +52,9 @@ class ShangHaiTaxplayerCrawler(TaxplayerDownload,SpiderMan):
     def log(self, message):
         log_name = 'sh_taxplayer_crawler.log'
         # self.logger(log_name, message)
-        print message
+        print(message)
+
+
 
     def get_tag_list(self,url):
         tag_list = []
@@ -69,25 +71,25 @@ class ShangHaiTaxplayerCrawler(TaxplayerDownload,SpiderMan):
     def run(self):
         log_name = 'shang_hai_tax_qs.log'
         info = self.get_url_info()
-        print len(info)
+        print(len(info))
         for num_source in range(len(info)):
             self.stop_crawl = False
             region = info[num_source][6]
-            print region
+            print(region)
             xzqy_py = info[num_source][7]
             url_source = info[num_source][10]
             url_host = info[num_source][12]
             # self.log(region + ' ' + xzqy_py + ' ' + url_source)
             url = url_source + '/index.html'
-            print url
+            print(url)
             # self.log(region)
             for p in range(0, 30):
                 if self.stop_crawl == True:
-                    print region + u'爬虫结束，页码: ',p
+                    print(region + u'爬虫结束，页码: ',p)
                     break
                 if p == 0:
                     url = url
-                    print 'url1',url
+                    print('url1',url)
                 else:
                     url = url_source + '/index_' + str(p) + '.html'
                 # self.log(region + '  ' + url)
@@ -102,7 +104,7 @@ class ShangHaiTaxplayerCrawler(TaxplayerDownload,SpiderMan):
                             fbrq = fbrq[0]
                         if fbrq <= self.fbrq_stop:
                             self.stop_crawl = True
-                            print u'发布日期爬取到达设定最早日期'
+                            print(u'发布日期爬取到达设定最早日期')
                             break
 
                         parse_tag = self.parse_tag(num_source, tag,url_host,url_source,fbrq,log_name,region)
@@ -110,7 +112,7 @@ class ShangHaiTaxplayerCrawler(TaxplayerDownload,SpiderMan):
                     # 通过协程处理每个详情页信息
                     gevent.joinall(tasks)
                 else:
-                    print u'tag_list为空,page_url: ',url
+                    print(u'tag_list为空,page_url: ',url)
                     self.log(u'tag_list为空,page_url:' + url)
                     self.stop_crawl = True
 
@@ -126,13 +128,13 @@ class ShangHaiTaxplayerCrawler(TaxplayerDownload,SpiderMan):
         else:
             url_inner = url_host + href
         self.log('url_inner: ' + url_inner)
-        # print 'url_inner', url_inner
+        # print('url_inner', url_inner)
 
         html_filename = self.get_html_filename(url_inner)
         html_savepath = os.path.join(self.path,html_filename)
         title = a_tag.text.strip()
         if (u'欠税公告' in title or u'欠' in title or u'非正常' in title) and (u'催缴' not in title):
-            print 'title',title,url_inner
+            print('title',title,url_inner)
             r_inner = self.get(url_inner)
             r_inner.encoding = 'utf-8'
             res_inner = BeautifulSoup(r_inner.text, 'html5lib')
@@ -150,7 +152,7 @@ class ShangHaiTaxplayerCrawler(TaxplayerDownload,SpiderMan):
                         download_url = url_host_now + href_inner
                     else:
                         download_url = url_host + href_inner
-                    print 'download_url', download_url
+                    print('download_url', download_url)
                     filename = self.get_filename(download_url)
                     savepath = os.path.join(self.path,filename)
 
@@ -162,7 +164,7 @@ class ShangHaiTaxplayerCrawler(TaxplayerDownload,SpiderMan):
                     else:
                         self.download_file(download_url, filename, savepath)
                         data_to_mysql(log_name, 0, sql)
-                        print 'download_url_true', download_url
+                        print('download_url_true', download_url)
             else:
                 sql = "INSERT into taxplayer_filename VALUES('%s', '%s', '%s', '%s', '%s', " \
                       "'%s', '%s')" % (self.province, region, fbrq, title, html_filename, url_inner,
@@ -172,7 +174,7 @@ class ShangHaiTaxplayerCrawler(TaxplayerDownload,SpiderMan):
                 else:
                     self.download_htmlfile(r_inner, html_savepath)
                     data_to_mysql(log_name, 0, sql)
-                    print 'html_savepath', html_savepath
+                    print('html_savepath', html_savepath)
 
 
 if __name__ == '__main__':

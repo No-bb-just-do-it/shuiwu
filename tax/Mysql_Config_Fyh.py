@@ -44,7 +44,7 @@ def data_to_mysql(log_name, db_no, sql, repeat_time=0, val=''):
 
 def logger(log_name, message):
     parent_dir = os.path.join(os.path.dirname(__file__), '../logs/downloadlogs')
-    print 'parent_dir',parent_dir
+    print('parent_dir',parent_dir)
     today = time.strftime('%Y-%m-%d')
     write_time = time.strftime('%H:%M:%S')
     log_directory = os.path.join(parent_dir, today)
@@ -56,4 +56,4 @@ def logger(log_name, message):
         os.makedirs(log_directory)
     with open(log_path, 'a') as f:
         f.write(write_time + '    ' + message + '\n')
-    print write_time,'  ',message
+    print(write_time,'  ',message)
