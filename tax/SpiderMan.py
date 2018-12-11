@@ -12,7 +12,7 @@ class SpiderMan(object):
     manager_port = 8080
     order = None
 
-    def __init__(self, order='5fe6cf97-5592-11e7-be16-f45c89a63279', keep_session=True, keep_ip=False, max_try_times=8,headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0'}):
+    def __init__(self, order='5fe6cf97-5592-11e7-be16-f45c89a63279', keep_session=True, keep_ip=False, max_try_times=5,headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0'}):
         self.order = order
         self.headers=headers
         self.keep_ip = keep_ip
@@ -46,9 +46,13 @@ class SpiderMan(object):
                         raise StatusCodeException(str(r.status_code))
                     return r
             except (requests.exceptions.RequestException,StatusCodeException) as e:
-                time.sleep(5)
+            # except Exception as e:
+                # time.sleep(2)
                 if t == self.max_try_times - 1:
-                    raise e
+                    print(e)
+        return None
+
+                    # raise e
 
     def post(self, url, **kwargs):
         for t in range(self.max_try_times):

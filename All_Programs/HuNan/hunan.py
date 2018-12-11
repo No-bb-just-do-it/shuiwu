@@ -128,6 +128,7 @@ class HuNan(TaxConfig):
 
 
 
+
     #地级市非正常户
     def abnormal_cities(self):
 
@@ -184,6 +185,7 @@ class HuNan(TaxConfig):
         title = a_tag.get('title')
         if u'欠' in title or u'缴' in title or u'非正常户' in title or u'失踪' in title:
             # url_detail = 'http://www.hhgtax.gov.cn/hhgtax/article_content_xxgk.jsp?id=20181106283800&smallclassid=20180629130174'
+
             r_inner = self.get(url_detail)
             charset1 = chardet.detect(r_inner.content)['encoding']
             # print(charset1)
