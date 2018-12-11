@@ -146,7 +146,7 @@ class TaxConfig(SpiderMan):
         #print('filename ',filename)
         #print('savepath ',savepath)
         for k in range(5):
-            # try:
+            try:
                 fs = self.get(download_url, timeout=15)
                 # print(fs)
                 if fs.status_code == 200:
@@ -164,11 +164,11 @@ class TaxConfig(SpiderMan):
                     with open(savepath, 'wb') as f:
                         f.write(download_url_content)
                     break
-            # except Exception as e:
-            #     print(e)
-            #     if k == 4:
-            #         print(u'下载失败:', download_url)
-            #         # logger('download_url','下载失败')
-            #
-            #     else:
-            #         print(u'第' + str(k) + u'次下载请求')
+            except Exception as e:
+                print(e)
+                if k == 4:
+                    print(u'下载失败:', download_url)
+                    # logger('download_url','下载失败')
+
+                # else:
+                #     print(u'第' + str(k) + u'次下载请求')

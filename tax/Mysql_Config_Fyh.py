@@ -49,8 +49,8 @@ def logger(log_name, message):
     write_time = time.strftime('%H:%M:%S')
     log_directory = os.path.join(parent_dir, today)
     log_path = os.path.join(log_directory , log_name)
-    if type(message) == unicode:
-        message = message.encode('utf8')
+    # if type(message) == unicode:
+    #     message = message.encode('utf8')
     # log_directory = log_name.replace(log_name.split('\\')[-1], '')
     if not os.path.exists(log_directory):
         os.makedirs(log_directory)
