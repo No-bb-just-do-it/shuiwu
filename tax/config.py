@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import re
 from codecs import open
 import chardet
-
+from threading import Lock
 class TaxConfig(SpiderMan):
     def __init__(self):
         super(TaxConfig,self).__init__()
@@ -61,30 +61,32 @@ class TaxConfig(SpiderMan):
             with open(log_path, 'a') as f:
                 f.write(write_time + '    ' + message + '\n')
 
-    def save_to_mysql(self, sql, log_name = None):
+    def save_to_mysql(self, sql, log_name = None,lock = None):
         """
         用来将数据插入到mysql数据库，并记录插入异常，另外返回重复次数。
         :param sql: 插入语句
         :param num_repeat: 插入语句执行重复条数
         :param nun_fail：执行sql失败条数
         """
-        for i in range(1):
-        # try:
+        # for i in range(1):
+        try:
+            lock.acquire()
             self.cursor.execute(sql)
             self.conn.commit()
+            lock.release()
             # data_nums = [num_repeat, num_fail]
             # return data_nums
-        # except Exception as e:
+        except Exception as e:
         #     # print('e',e.args)
         #     if e.args[0] == 2006:
         #         time.sleep(2)
-        #         # data_nums = self.save_to_mysql(sql, num_repeat, num_fail)
+        # #         # data_nums = self.save_to_mysql(sql, num_repeat, num_fail)
         #         self.save_to_mysql(sql)
-        #         # return data_nums
-        #     elif e.args[0] != 1062:
+        # #         # return data_nums
+            if e.args[0] != 1062:
         #         # num_fail += 1
         #         print(sql)
-        #         print(e)
+                print(e)
 
 
 

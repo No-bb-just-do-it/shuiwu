@@ -12,6 +12,7 @@ import gevent,gevent.monkey
 from codecs import open
 import chardet
 import threading
+lock = threading.Lock()
 # gevent.monkey.patch_all()
 
 
@@ -211,19 +212,20 @@ class HuNan(TaxConfig):
                           "'%s', '%s', '%s')" % (self.province, region, fbrq, title, filename,
                                                  download_url, self.last_update_time)
                     if os.path.isfile(savepath):
-                        self.save_to_mysql(sql,self.log_name)
+                        self.save_to_mysql(sql,self.log_name,lock=lock)
                     else:
                         self.log('url_detail: ' + url_detail)
                         self.log('download_url: ' + download_url)
                         print('download_url', download_url)
                         self.download_file(download_url, filename, savepath)
-                        self.save_to_mysql(sql,self.log_name)
+                        self.save_to_mysql(sql,self.log_name,lock=lock)
             else:
                 sql = "INSERT into taxplayer_filename VALUES('%s', '%s', '%s', '%s', '%s', " \
                       "'%s', '%s')" % (self.province, region, fbrq, title, html_filename, url_detail,
                                        self.last_update_time)
                 if os.path.isfile(html_savepath):
-                    self.save_to_mysql(sql,self.log_name)
+
+                    self.save_to_mysql(sql,self.log_name,lock=lock)
                 else:
                     self.log('url_detail_down_html: ' + url_detail)
                     print('url_detail_html ',url_detail)
@@ -231,7 +233,7 @@ class HuNan(TaxConfig):
                         # print(r_inner.content.decode('gbk'))
                         f.write(r_inner.content.decode(charset1,'ignore'))
 
-                    self.save_to_mysql(sql,self.log_name)
+                    self.save_to_mysql(sql,self.log_name,lock=lock)
 
 
     def get_tag_list(self,url,params=None,headers=None):
