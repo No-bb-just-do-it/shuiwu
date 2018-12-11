@@ -187,6 +187,8 @@ class HuNan(TaxConfig):
             # url_detail = 'http://www.hhgtax.gov.cn/hhgtax/article_content_xxgk.jsp?id=20181106283800&smallclassid=20180629130174'
 
             r_inner = self.get(url_detail)
+            if not r_inner:
+                return
             charset1 = chardet.detect(r_inner.content)['encoding']
             # print(charset1)
             r_inner.encoding = 'gb18030'

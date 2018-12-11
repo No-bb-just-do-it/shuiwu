@@ -61,34 +61,41 @@ class TaxConfig(SpiderMan):
             with open(log_path, 'a') as f:
                 f.write(write_time + '    ' + message + '\n')
 
-    def save_to_mysql(self, sql, log_name = None,num_repeat=3, num_fail=0):
+    def save_to_mysql(self, sql, log_name = None):
         """
         用来将数据插入到mysql数据库，并记录插入异常，另外返回重复次数。
         :param sql: 插入语句
         :param num_repeat: 插入语句执行重复条数
         :param nun_fail：执行sql失败条数
         """
-        try:
+        for i in range(1):
+        # try:
             self.cursor.execute(sql)
             self.conn.commit()
-            data_nums = [num_repeat, num_fail]
-            return data_nums
-        except Exception as e:
-            # print('e',e.args)
-            if e.args[0] == 2006:
-                time.sleep(3)
-                data_nums = self.save_to_mysql(sql, num_repeat, num_fail)
-                return data_nums
-            elif e.args[0] != 1062:
-                num_fail += 1
-                print(sql, e)
+            # data_nums = [num_repeat, num_fail]
+            # return data_nums
+        # except Exception as e:
+        #     # print('e',e.args)
+        #     if e.args[0] == 2006:
+        #         time.sleep(2)
+        #         # data_nums = self.save_to_mysql(sql, num_repeat, num_fail)
+        #         self.save_to_mysql(sql)
+        #         # return data_nums
+        #     elif e.args[0] != 1062:
+        #         # num_fail += 1
+        #         print(sql)
+        #         print(e)
+
+
+
+
                 # self.logger(log_name, 'hunan')
                 # self.logger(log_name, str(e[0]))
                 # self.logger(log_name, sql)
-            else:
-                num_repeat += 1
-            data_nums = [num_repeat, num_fail]
-            return data_nums
+            # else:
+            #     num_repeat += 1
+            # data_nums = [num_repeat, num_fail]
+            # return data_nums
 
     # 获得需要保存的html文件名
     def get_html_filename(self, url_inner):
