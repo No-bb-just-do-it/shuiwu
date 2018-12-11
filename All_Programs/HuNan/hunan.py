@@ -96,6 +96,7 @@ class HuNan(TaxConfig):
             url_start = 'http://www.%sgtax.gov.cn/%sgtax/article_list_xxgk_fl.jsp' % (pinyin,pinyin)
             url_source = 'http://www.%sgtax.gov.cn/%sgtax/' % (pinyin,pinyin)
             url_host = 'http://www.%sgtax.gov.cn' % pinyin
+            tag_list_before = []
             for p in range(10):
                 self.last_update_time = time.strftime('%Y-%m-%d %H:%M:%S')
                 params = {
@@ -103,9 +104,10 @@ class HuNan(TaxConfig):
                     'smallclassid': 20180629130174
                     }
                 tag_list = self.get_tag_list(url_start,params=params)
-                if not tag_list:
+                if not tag_list or tag_list_before == tag_list:
                     print(u'无详情页列表信息，爬虫结束')
                     break
+                tag_list_before = tag_list
                 taskList = []
                 self.t = time.strftime('%Y-%m-%d %H:%M:%S')
                 print('page: ',p)
@@ -191,19 +193,21 @@ class HuNan(TaxConfig):
 
     def get_tag_list(self,url,params=None,headers=None):
         for t in range(5):
-            r = self.get(url,params=params)
-            # r1 = requests.get(url,params=params,headers=headers)
-            # print(r1.content)
-            # print(r.text)
-            if r.status_code == 200:
-                r.encoding = 'gbk'
-                res = BeautifulSoup(r.text, 'html5lib')
-                box = res.find('ul',{'class':'txtcenm overf'})
-                tag_list = box.find_all('li')
-                # for i in tag_list:
-                #     print(i)
-                return tag_list
-        return None
+            try:
+                r = self.get(url,params=params)
+                # r1 = requests.get(url,params=params,headers=headers)
+                # print(r1.content)
+                # print(r.text)
+                if r.status_code == 200:
+                    r.encoding = 'gbk'
+                    res = BeautifulSoup(r.text, 'html5lib')
+                    box = res.find('ul',{'class':'txtcenm overf'})
+                    tag_list = box.find_all('li')
+                    # for i in tag_list:
+                    #     print(i)
+                    return tag_list
+            except:
+                return None
 
     def ts(self):
         r = self.get('http://www.hhgtax.gov.cn/hhgtax/article_content_xxgk.jsp?id=20181106283800&smallclassid=20180629130174')
