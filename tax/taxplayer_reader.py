@@ -1,5 +1,5 @@
 # coding=utf-8
-from Mysql_Config_Fyh import my_conn
+from tax.Mysql_Config_Fyh import my_conn
 import os
 import time
 import xlwt
@@ -15,7 +15,7 @@ from bs4 import BeautifulSoup
 
 class TaxplayerReader(object):
     def __init__(self):
-        self.province = u''
+        self.province = ''
         self.province_py = ''
         self.conn = None
         self.cursor = None
@@ -36,57 +36,57 @@ class TaxplayerReader(object):
         self.log_name = '%s_reader.log' % self.province_py
         self.test_log_name = '%s_reader_test.log' % self.province_py
         self.abnormal_fields = [
-            {'nsrsbh': u'社会信用代码（纳税人识别号）,税务登记证号,纳税人识别号码,税务登记号,税务登记代码,纳税识别号'},
-            {'nsrmc': u'纳税人名称,企业或单位名称,非正常户欠税人名称,企业名称'},
-            {'fddbr': u'法人代表,法定代表人姓名,法定代表人(负责人)姓名,法定代表人（负责人）姓名,法人名称,业主姓名,法人姓名'},
-            {'rdrq': u'非正常户认定日期'},
-            {'djrq': u'登记日期'},
-            {'jydz': u'生产经营地址,实际经营地址,经营（注册）地址'},
-            {'zcdz': u'注册地址'},
-            {'zjzl': u'证件种类'},
-            {'zjhm': u'证件号码'},
-            {'qyxz': u'登记注册类型'},
-            {'swjg': u'认定税务机关，主管税务机关,主管税务所（科、分局）,管理科所,主管税务所（科、分局）'}
+            {'nsrsbh': '社会信用代码（纳税人识别号）,税务登记证号,纳税人识别号码,税务登记号,税务登记代码,纳税识别号'},
+            {'nsrmc': '纳税人名称,企业或单位名称,非正常户欠税人名称,企业名称'},
+            {'fddbr': '法人代表,法定代表人姓名,法定代表人(负责人)姓名,法定代表人（负责人）姓名,法人名称,业主姓名,法人姓名'},
+            {'rdrq': '非正常户认定日期'},
+            {'djrq': '登记日期'},
+            {'jydz': '生产经营地址,实际经营地址,经营（注册）地址'},
+            {'zcdz': '注册地址'},
+            {'zjzl': '证件种类'},
+            {'zjhm': '证件号码'},
+            {'qyxz': '登记注册类型'},
+            {'swjg': '认定税务机关，主管税务机关,主管税务所（科、分局）,管理科所,主管税务所（科、分局）'}
         ]
         self.qs_fields = [
-            {'nsrsbh': u'税号,社会信用代码（纳税人识别号）,纳税人识别码,税务登记代码,税务登记证号,税务登记号码,'
-                       u'纳税识别号'},
-            {'nsrmc': u'纳税人名称,企业名称,企业（单位）名称,单位名称,欠税纳税人名称,业主名称,企业或单位名称,纳税人全称'
-                      u'企业（单位、业主或个人）名称,欠税企业名称,单位（个人）名称,企业或单位的名称,非正常户欠税人名称,'
-                      u'纳税人名称(姓名),单位名称（业主姓名）,企业、单位名称,企业或单位（业主）名称'},
-            {'fddbr': u'法定代表人（负责人）/业主姓名,法人（负责人）,法定代表人（负责人、业主）,'
-                      u'法定代表人姓名,法定代表人（负责人）姓名,法人（业主）姓名,法人代表,法人(负责人)姓名,法人姓名'},
-            {'zjzl': u'证件种类'},
-            {'zjhm': u'证件号码'},
-            {'jydz': u'生产经营地址,生产经营地点,经营（注册）地址'},
-            {'ssqs': u'税款所属期起,税费所属期起,所属时期起'},
-            {'ssqz': u'税款所属期止,税费所属期止,所属时期止'},
-            {'xjrq': u'限缴日期,缴款期限,税款限缴日期'},
-            {'qssz': u'欠税税种,征收项目,欠税项目,欠税（费）种,欠税（费）种（地税）,欠缴税种,欠税（费）种类，所欠税种'},
-            {'swjg': u'主管税务所（科、分局）,主管税务机关'},
-            {'cqsje': u'陈欠余额,期末陈欠,陈欠金额'},
-            {'qsje': u'欠税余额,应补(退)税额,欠税余额（元）,欠税金额,总计欠税金额,未缴金额,欠缴税款金额,欠缴税费余额,'
-                     u'欠税金额（元）,求和项:应补(退)税额,实缴额（单位：元）,实缴额,欠税总额(万元),欠税总额（万元）,'
-                     u'欠税金额（元角分）,欠税额,欠缴金额（元）,欠税金额（万元）,期未欠税（元）,欠税额度（元）,'
-                     u'欠税（费）余额（元）,欠税(担保欠税)余额(元),欠税（担保欠税）余额金额（元）,税额（元）'
-                     u'欠税(担保欠税)余额金额(元),欠税金额(元),截止本期拖欠税款情况，欠缴税款总金额'
-                     u'欠税公告金额（元）,截止本期拖欠税款情况'},
-            {'dqsje': u'当期'},
+            {'nsrsbh': '税号,社会信用代码（纳税人识别号）,纳税人识别码,税务登记代码,税务登记证号,税务登记号码,'
+                       '纳税识别号'},
+            {'nsrmc': '纳税人名称,企业名称,企业（单位）名称,单位名称,欠税纳税人名称,业主名称,企业或单位名称,纳税人全称'
+                      '企业（单位、业主或个人）名称,欠税企业名称,单位（个人）名称,企业或单位的名称,非正常户欠税人名称,'
+                      '纳税人名称(姓名),单位名称（业主姓名）,企业、单位名称,企业或单位（业主）名称'},
+            {'fddbr': '法定代表人（负责人）/业主姓名,法人（负责人）,法定代表人（负责人、业主）,'
+                      '法定代表人姓名,法定代表人（负责人）姓名,法人（业主）姓名,法人代表,法人(负责人)姓名,法人姓名'},
+            {'zjzl': '证件种类'},
+            {'zjhm': '证件号码'},
+            {'jydz': '生产经营地址,生产经营地点,经营（注册）地址'},
+            {'ssqs': '税款所属期起,税费所属期起,所属时期起'},
+            {'ssqz': '税款所属期止,税费所属期止,所属时期止'},
+            {'xjrq': '限缴日期,缴款期限,税款限缴日期'},
+            {'qssz': '欠税税种,征收项目,欠税项目,欠税（费）种,欠税（费）种（地税）,欠缴税种,欠税（费）种类，所欠税种'},
+            {'swjg': '主管税务所（科、分局）,主管税务机关'},
+            {'cqsje': '陈欠余额,期末陈欠,陈欠金额'},
+            {'qsje': '欠税余额,应补(退)税额,欠税余额（元）,欠税金额,总计欠税金额,未缴金额,欠缴税款金额,欠缴税费余额,'
+                     '欠税金额（元）,求和项:应补(退)税额,实缴额（单位：元）,实缴额,欠税总额(万元),欠税总额（万元）,'
+                     '欠税金额（元角分）,欠税额,欠缴金额（元）,欠税金额（万元）,期未欠税（元）,欠税额度（元）,'
+                     '欠税（费）余额（元）,欠税(担保欠税)余额(元),欠税（担保欠税）余额金额（元）,税额（元）'
+                     '欠税(担保欠税)余额金额(元),欠税金额(元),截止本期拖欠税款情况，欠缴税款总金额'
+                     '欠税公告金额（元）,截止本期拖欠税款情况'},
+            {'dqsje': '当期'},
 
         ]
 
     def log(self, message):
         if self.db_table:
             self.logger(self.test_log_name, message)
-            print message
+            print(message)
         else:
             self.logger(self.log_name, message)
-            print message
+            print(message)
 
     def word_to_html(self):
         sql = "SELECT * from taxplayer_filename where (title like '%欠税%' or title like '%缴%' or title " \
               "like '%非正常户%' or title like '%非正户%') and filename like '%.doc%' and province = '" + \
-              self.province.encode('utf8') + "' and last_update_time like " + self.today
+              self.province + "' and last_update_time like " + self.today
         save_directory = self.path + '\word_to_html\\'
         self.convert_word_to_html(sql, self.path, save_directory)
 
@@ -171,8 +171,8 @@ class TaxplayerReader(object):
             with open(log_path, 'a') as f:
                 f.write(write_time + '    ' + str(message))
         else:
-            if type(message) == unicode:
-                message = message.encode('utf8')
+            # if type(message) == unicode:
+            #     message = message.encode('utf8')
             with open(log_path, 'a') as f:
                 f.write(write_time + '    ' + message + '\n')
 
@@ -217,7 +217,7 @@ class TaxplayerReader(object):
                 return data_nums
             elif e[0] != 1062:
                 num_fail += 1
-                print num_info + 1, sql, e
+                print(num_info + 1, sql, e)
                 self.logger(log_name, self.province_py)
                 self.logger(log_name, str(num_info + 1))
                 self.logger(log_name, str(e[0]))
@@ -233,7 +233,7 @@ class TaxplayerReader(object):
         :param sql: sql查询语句。
         :return: 返回需要解析的文件信息。
         """
-        print sql
+        print(sql)
         info = []
         self.cursor.execute(sql)
         info = self.cursor.fetchall()
@@ -273,7 +273,7 @@ class TaxplayerReader(object):
     #             elif col_two.strip():
     #                 col_twos.append(_idx + 1)
     #         col_two_nums = len(col_twos)
-    #         print col_nums, col_two_nums
+    #         print(col_nums, col_two_nums
     #         if col_two_nums > 2 and col_two_nums > col_nums:
     #             start_idx = _idx + 2
     #             break
@@ -294,15 +294,15 @@ class TaxplayerReader(object):
         """
         start_idx = 0
         for _idx in range(0, rows):
-            col_val = u''
+            col_val = ''
             for col in table.row_values(_idx):
                 if isinstance(col, float):
                     col_val += str(col)
                 elif col.strip():
                     col_val += col.strip()
-            match_fields = [u'纳税人识别号', u'纳税人名称', u'纳税人识别码', u'税务登记号码', u'企业或单位名称',
-                            u'税务登记证号', u'税务登记号', u'纳税识别号', u'纳税人名称', u'业户名称', u'企业名称',
-                            u'经营地点']
+            match_fields = [u'纳税人识别号', '纳税人名称', '纳税人识别码', '税务登记号码', '企业或单位名称',
+                            '税务登记证号', '税务登记号', '纳税识别号', '纳税人名称', '业户名称', '企业名称',
+                            '经营地点']
             match_condition = True in [match_field in col_val for match_field in match_fields]
             if match_condition:
                 start_idx = _idx + 1
@@ -318,7 +318,7 @@ class TaxplayerReader(object):
         :param row_num: 写入表的起始位置
         :return:
         """
-        print sql
+        print(sql)
         self.cursor.execute(sql)
 
         # break
@@ -356,13 +356,13 @@ class TaxplayerReader(object):
                                 start_idx = self.get_excel_start_idx(table, rows)
                                 if start_idx < 1:
                                     start_idx = 1
-                                # print start_idx, start_idx + t - 1, start_idx + t
+                                # print(start_idx, start_idx + t - 1, start_idx + t
                                 for line in range(start_idx + t - 1, start_idx + t, 1):
                                     sheet.write(row, 0, n + 1)
                                     row_val = table.row_values(line)
                                     for j in range(len(row_val)):
                                         if t == 0:
-                                            val = row_val[j].strip().replace(u'\n', u'').replace(u' ', u'')
+                                            val = row_val[j].strip().replace(u'\n', '').replace(u' ', '')
                                             val = ''.join(val.split())
                                         else:
                                             val = row_val[j]
@@ -389,19 +389,19 @@ class TaxplayerReader(object):
                                     sheet.write(row, 0, n + 1)
                                     for j in range(len(tag_values)):
                                         if t == 0:
-                                            val = tag_values[j].text.strip().replace(u'\n', u'').replace(u' ', u'')
+                                            val = tag_values[j].text.strip().replace(u'\n', '').replace(u' ', '')
                                             val = ''.join(val.split())
                                         else:
                                             val = tag_values[j].text
                                         sheet.write(row, j + 1, val)
                             except Exception as e:
-                                print e
-                                print n + 1, info[n][4]
+                                print(e)
+                                print(n + 1, info[n][4])
                                 sheet.write(row, 0, n + 1)
                                 sheet.write(row, 1, '?')
                         else:
-                            print e
-                            print n + 1, info[n][4]
+                            print(e)
+                            print(n + 1, info[n][4])
                             row += 1
                             sheet.write(row, 0, n + 1)
                             sheet.write(row, 1, '?')
@@ -420,9 +420,9 @@ class TaxplayerReader(object):
         :return: 处理后的数据
         """
         if isinstance(val, float):
-            val = str(val).decode('utf8').replace(u'\n', '').replace(u' ', u'')
+            val = str(val).decode('utf8').replace(u'\n', '').replace(u' ', '')
         else:
-            val = val.strip().replace(u'\n', '').replace(u' ', u'')
+            val = val.strip().replace(u'\n', '').replace(u' ', '')
         val = ''.join(val.split())
         return val
 
@@ -437,13 +437,13 @@ class TaxplayerReader(object):
         dw = False
         if start_idx:
             for i in range(0, start_idx):
-                col_val = u''
+                col_val = ''
                 for col in table.row_values(i):
                     if isinstance(col, float):
                         col_val += str(col)
                     elif col.strip():
                         col_val += col.strip()
-                fields = [u': 万', u':万', u'：万', u'： 万']
+                fields = [u': 万', ':万', '：万', '： 万']
                 wan_condition = True in [field in col_val for field in fields]
                 if wan_condition:
                     dw = True
@@ -462,7 +462,7 @@ class TaxplayerReader(object):
                 temp_val = self.get_tag_val(val)
             else:
                 temp_val = self.get_row_val(val)
-            if re.findall(u'.+税', temp_val) and u'欠税' not in temp_val:
+            if re.findall(u'.+税', temp_val) and '欠税' not in temp_val:
                 sz_time += 1
         return sz_time
 
@@ -482,11 +482,11 @@ class TaxplayerReader(object):
         match_fields = []
         wan = False
         keys = []
-        zjhms = [u'证件号码', u'身份证号', u'法人证件号', u'身份号码', u'有效证件号', u'法人代表人身份证']
-        repeat_qsjes = [u'截止', u'欠税情况', u'欠缴地方税金额（单位：元）', u'欠税税种及欠税金额']
-        qsjes = [u'欠税余额', u'欠税金额',u'欠缴税款金额']
-        dqsjes = [u'当期', u'其中', u'新增', u'新发生', u'新欠']
-        filter_rqs = [u'日期', u'税款所属期']
+        zjhms = [u'证件号码', '身份证号', '法人证件号', '身份号码', '有效证件号', '法人代表人身份证']
+        repeat_qsjes = [u'截止', '欠税情况', '欠缴地方税金额（单位：元）', '欠税税种及欠税金额']
+        qsjes = [u'欠税余额', '欠税金额',u'欠缴税款金额']
+        dqsjes = [u'当期', '其中', '新增', '新发生', '新欠']
+        filter_rqs = [u'日期', '税款所属期']
         rq_keys = ['xjrq', 'ssqs', 'ssqz']
         start_idx = self.get_excel_start_idx(table, rows)
         if start_idx == 0:
@@ -503,7 +503,7 @@ class TaxplayerReader(object):
             row_val = table.row_values(j)
             for k in range(len(row_val)):
                 val = self.get_row_val(row_val[k])
-                # print 'val', val, len(val)
+                # print('val', val, len(val)
                 for fds in range(len(fields)):
                     match_field = fields[fds].values()[0]
                     match_key = fields[fds].keys()[0]
@@ -513,22 +513,22 @@ class TaxplayerReader(object):
                     qsje_condition = True in [qsje in val for qsje in qsjes]
                     dqsje_condition = True in [dqsje in val for dqsje in dqsjes]
                     filter_rq_condition = True in [rq == val for rq in filter_rqs]
-                    if u'纳税人识别号' in match_field:
+                    if '纳税人识别号' in match_field:
                         if match_key not in keys:
-                            if u'纳税人识别号' in val or match_condition:
+                            if '纳税人识别号' in val or match_condition:
                                 match_fields.append({match_key: k})
                                 keys.append(match_key)
-                    elif match_field == u'证件种类':
+                    elif match_field == '证件种类':
                         if match_key not in keys:
-                            if match_field in val or u'证件类型' in val or u'证件名称' in val:
+                            if match_field in val or '证件类型' in val or '证件名称' in val:
                                 match_fields.append({match_key: k})
                                 keys.append(match_key)
-                    elif match_field == u'证件号码':
+                    elif match_field == '证件号码':
                         if match_key not in keys:
                             if zjhm_condition:
                                 match_fields.append({match_key: k})
                                 keys.append(match_key)
-                    elif match_field == u'当期':
+                    elif match_field == '当期':
                         if match_key not in keys:
                             if dqsje_condition:
                                 match_fields.append({match_key: k})
@@ -548,16 +548,16 @@ class TaxplayerReader(object):
                             if sz_time <= 1:
                                 match_fields.append({match_key: k})
                                 keys.append(match_key)
-                    elif u'法定代表人' in match_field:
+                    elif '法定代表人' in match_field:
                         if match_key not in keys:
                             temp_row_val = table.row_values(j + 1)
                             for t in range(len(temp_row_val)):
                                 temp_val = self.get_row_val(temp_row_val[t])
                                 zjhm_condition_temp = True in [zjhm in temp_val for zjhm in zjhms]
-                                if u'姓名' in temp_val:
+                                if '姓名' in temp_val:
                                     match_fields.append({match_key: t})
                                     keys.append(match_key)
-                                elif u'证件名称' in temp_val or u'证件种类' in temp_val or u'证件类型' in temp_val:
+                                elif '证件名称' in temp_val or '证件种类' in temp_val or '证件类型' in temp_val:
                                     if 'zjzl' not in keys:
                                         match_fields.append({'zjzl': t})
                                         keys.append('zjzl')
@@ -566,12 +566,12 @@ class TaxplayerReader(object):
                                         match_fields.append({'zjhm': t})
                                         keys.append('zjhm')
                             if match_key not in keys:
-                                if (u'法定代表' in val or u'法人' in val or match_condition) and not zjhm_condition:
+                                if (u'法定代表' in val or '法人' in val or match_condition) and not zjhm_condition:
                                     match_fields.append({match_key: k})
                                     keys.append(match_key)
-                    elif u'欠税余额' in match_field:
+                    elif '欠税余额' in match_field:
                         if match_key not in keys:
-                            if u'合计' in val:
+                            if '合计' in val:
                                 if match_key not in keys:
                                     match_fields.append({match_key: k})
                                     keys.append(match_key)
@@ -584,17 +584,17 @@ class TaxplayerReader(object):
                                 for t in range(len(temp_row_val)):
                                     temp_val = self.get_row_val(temp_row_val[t])
                                     dqsje_condition_temp = True in [dqsje in temp_val for dqsje in dqsjes]
-                                    if u'税种' in temp_val:
+                                    if '税种' in temp_val:
                                         if 'qssz' not in keys and sz_time <= 1:
                                             match_fields.append({'qssz': t})
                                             keys.append('qssz')
-                                    elif u'合计' in temp_val:
+                                    elif '合计' in temp_val:
                                         if match_key not in keys:
                                             wan = wan or dw
                                             match_fields.append({match_key: t})
                                             keys.append(match_key)
                                             break
-                                    elif temp_val in match_field and temp_val and u'万元' in temp_val:
+                                    elif temp_val in match_field and temp_val and '万元' in temp_val:
                                         if match_key not in keys:
                                             wan = True
                                             match_fields.append({match_key: t})
@@ -610,7 +610,7 @@ class TaxplayerReader(object):
                                             match_fields.append({'dqsje': t})
                                             keys.append('dqsje')
                                 if match_key not in keys:
-                                    if (match_condition or qsje_condition) and not dqsje_condition and u'万元' in val:
+                                    if (match_condition or qsje_condition) and not dqsje_condition and '万元' in val:
                                         wan = True
                                         match_fields.append({match_key: k})
                                         keys.append(match_key)
@@ -620,7 +620,7 @@ class TaxplayerReader(object):
                                         keys.append(match_key)
                             else:
                                 if match_key not in keys:
-                                    if (match_condition or qsje_condition) and not dqsje_condition and u'万元' in val:
+                                    if (match_condition or qsje_condition) and not dqsje_condition and '万元' in val:
                                         wan = True
                                         match_fields.append({match_key: k})
                                         keys.append(match_key)
@@ -633,7 +633,7 @@ class TaxplayerReader(object):
                             match_fields.append({match_key: k})
                             keys.append(match_key)
         else:
-            print col_nums
+            print(col_nums)
         return match_fields, wan
 
     def get_excel_abnormal_field_info(self, table, rows, fields=None):
@@ -649,7 +649,7 @@ class TaxplayerReader(object):
         col_val = []
         match_fields = []
         keys = []
-        zjhms = [u'证件号码', u'身份证号码', u'法人证件号', u'证件名称', u'身份号码']
+        zjhms = [u'证件号码', '身份证号码', '法人证件号', '证件名称', '身份号码']
         # repeat_fddbrs = [u'法定代表人或业主']
         start_idx = self.get_excel_start_idx(table, rows)
         if start_idx == 0:
@@ -664,48 +664,48 @@ class TaxplayerReader(object):
             row_val = table.row_values(j)
             for k in range(len(row_val)):
                 if isinstance(row_val[k], float):
-                    val = str(row_val[k]).decode('utf8').replace(u'\n', '').replace(u' ', u'')
+                    val = str(row_val[k]).decode('utf8').replace(u'\n', '').replace(u' ', '')
                 else:
-                    val = row_val[k].strip().replace(u'\n', '').replace(u' ', u'')
+                    val = row_val[k].strip().replace(u'\n', '').replace(u' ', '')
                 val = ''.join(val.split())
-                # print 'val', val, len(val)
+                # print('val', val, len(val)
                 for fds in range(len(fields)):
                     match_field = fields[fds].values()[0]
                     match_key = fields[fds].keys()[0]
                     match_condition = val in match_field and val
                     zjhm_condition = True in [zjhm in val for zjhm in zjhms]
                     # repeat_fddbr_condtion = True in [fddbr == val for fddbr in repeat_fddbrs]
-                    if u'纳税人识别号' in match_field:
+                    if '纳税人识别号' in match_field:
                         if match_key not in keys:
-                            if u'纳税人识别号' in val or match_condition:
+                            if '纳税人识别号' in val or match_condition:
                                 match_fields.append({match_key: k})
                                 keys.append(match_key)
-                    elif match_field == u'证件号码':
+                    elif match_field == '证件号码':
                         if match_key not in keys:
                             if zjhm_condition:
                                 match_fields.append({match_key: k})
                                 keys.append(match_key)
-                    elif match_field == u'证件种类':
+                    elif match_field == '证件种类':
                         if match_key not in keys:
-                            if match_field in val or u'证件类型' in val:
+                            if match_field in val or '证件类型' in val:
                                 match_fields.append({match_key: k})
                                 keys.append(match_key)
-                    elif match_field == u'注册地址':
+                    elif match_field == '注册地址':
                         if match_key not in keys:
-                            if match_condition and u'注册' in val:
+                            if match_condition and '注册' in val:
                                 match_fields.append({match_key: k})
                                 keys.append(match_key)
-                    elif u'法定代表人' in match_field:
+                    elif '法定代表人' in match_field:
                         # if repeat_fddbr_condtion:
                         temp_vals = table.row_values(j + 1)
                         for t in range(len(temp_vals)):
                             if isinstance(temp_vals[t], float):
-                                temp_val = str(temp_vals[t]).decode('utf8').replace(u'\n', '').replace(u' ', u'')
+                                temp_val = str(temp_vals[t]).decode('utf8').replace(u'\n', '').replace(u' ', '')
                             else:
-                                temp_val = temp_vals[t].strip().replace(u'\n', '').replace(u' ', u'')
+                                temp_val = temp_vals[t].strip().replace(u'\n', '').replace(u' ', '')
                             temp_val = ''.join(temp_val.split())
                             zjhm_condition_temp = True in [zjhm in temp_val for zjhm in zjhms]
-                            if u'姓名' in temp_val and not zjhm_condition_temp:
+                            if '姓名' in temp_val and not zjhm_condition_temp:
                                 if match_key not in keys:
                                     match_fields.append({match_key: t})
                                     keys.append(match_key)
@@ -713,12 +713,12 @@ class TaxplayerReader(object):
                                 if 'zjhm' not in keys:
                                     match_fields.append({'zjhm': t})
                                     keys.append('zjhm')
-                            elif u'经营地址' in temp_val:
+                            elif '经营地址' in temp_val:
                                 if 'jydz' not in keys:
                                     match_fields.append({'jydz': t})
                                     keys.append('jydz')
                         if match_key not in keys:
-                            if (u'法定代表人' in val or u'法人代表' in val or match_condition) and not zjhm_condition:
+                            if (u'法定代表人' in val or '法人代表' in val or match_condition) and not zjhm_condition:
                                 match_fields.append({match_key: k})
                                 keys.append(match_key)
                     elif match_condition:
@@ -726,7 +726,7 @@ class TaxplayerReader(object):
                             match_fields.append({match_key: k})
                             keys.append(match_key)
         else:
-            print col_nums
+            print(col_nums)
         return match_fields
 
     def get_merge_cells(self, start_idx, table):
@@ -740,7 +740,7 @@ class TaxplayerReader(object):
         new_merge_cells = []
         merge_cells = table.merged_cells
         merge_cells.sort()
-        # print merge_cells, '**************'
+        # print(merge_cells, '**************'
         for merge_cell in merge_cells:
             if merge_cell[2] == 1 and merge_cell[0] >= start_idx:
                 new_merge_cells.append(merge_cell[0:2])
@@ -842,10 +842,10 @@ class TaxplayerReader(object):
                 rq = rq[0:4] + '-' + rq[4:6] + '-' + rq[6:8]
         else:
             val = table.cell(row, column).value.strip()
-            if type(val) == unicode:
-                rq = val.replace(u'年', u'-').replace(u'月', u'-').replace(u'日', u'-')
-                rq = rq.encode('utf8')[0:10]
-            elif len(val) > 9:
+            # if type(val) == unicode:
+            #     rq = val.replace(u'年', '-').replace(u'月', '-').replace(u'日', '-')
+            #     rq = rq.encode('utf8')[0:10]
+            if len(val) > 9:
                 rq = val[0:10]
             elif len(val) == 8:
                 rq = val[0:4] + '-' + val[4:6] + '-' + val[6:8]
@@ -868,7 +868,7 @@ class TaxplayerReader(object):
         :return:
         """
         self.get_directory(save_directory)
-        print sql
+        print(sql)
         self.cursor.execute(sql)  # 返回符合条件的总数表
         info = self.cursor.fetchall()
         self.log('num_info:' + str(len(info)))
@@ -888,9 +888,9 @@ class TaxplayerReader(object):
                         doc.SaveAs(savepath, 8)
                         doc.Close()
                 except:
-                    print n + 1, filepath
+                    print(n + 1, filepath)
             else:
-                print filepath + ' does not existed'
+                print(filepath + ' does not existed')
 
     def get_filepath(self, filename, file_directory):
         """
@@ -945,12 +945,12 @@ class TaxplayerReader(object):
         """
         new_tr_list = []
         for i in range(len(tr_list)):
-            tr_text = tr_list[i].text.strip().replace(u'\n', '').replace(u' ', u'').replace(' ', '')
-            # print tr_text
-            if u'纳税人识别号' in tr_text or u'纳税人名称' in tr_text or u'纳税人识别码' in tr_text \
-                    or u'税务登记号码' in tr_text or u'企业或单位名称' in tr_text or u'税务登记证号' in tr_text \
-                    or u'税务登记号' in tr_text or u'纳税识别号' in tr_text or u'纳税人名称' in tr_text \
-                    or u'业户名称' in tr_text:
+            tr_text = tr_list[i].text.strip().replace(u'\n', '').replace(u' ', '').replace(' ', '')
+            # print(tr_text
+            if '纳税人识别号' in tr_text or '纳税人名称' in tr_text or '纳税人识别码' in tr_text \
+                    or '税务登记号码' in tr_text or '企业或单位名称' in tr_text or '税务登记证号' in tr_text \
+                    or '税务登记号' in tr_text or '纳税识别号' in tr_text or '纳税人名称' in tr_text \
+                    or '业户名称' in tr_text:
                 new_tr_list = tr_list[i:]
                 break
         return new_tr_list
@@ -999,7 +999,7 @@ class TaxplayerReader(object):
                         inner_signal = True
                         return tr_list, inner_signal
             else:
-                print 'no tables'
+                print('no tables')
             return tr_list, inner_signal
         else:
             return [], inner_signal
@@ -1015,8 +1015,8 @@ class TaxplayerReader(object):
         """
         self.cursor.execute(sql)
         info = self.cursor.fetchall()
-        print sql
-        print len(info)
+        print(sql)
+        print(len(info))
         if len(info):
             if os.path.isfile(savepath):
                 rb = xlrd.open_workbook(savepath)
@@ -1034,7 +1034,7 @@ class TaxplayerReader(object):
                     sheet = f.add_sheet('fieldnames' + str(t), cell_overwrite_ok=True)
                     sheet.write(row, 0, 'html')
                 for n in range(0, len(info)):
-                    # print n + 1, '111111'
+                    # print(n + 1, '111111'
                     row += 1
                     province = info[n][0]
                     filepath = self.get_filepath(info[n][4], file_directory)
@@ -1054,17 +1054,17 @@ class TaxplayerReader(object):
                             sheet.write(row, 0, n + 1)
                             for j in range(len(tag_values)):
                                 if t == 0:
-                                    val = tag_values[j].text.strip().replace(u'\n', u'').replace(u' ', u'')
+                                    val = tag_values[j].text.strip().replace(u'\n', '').replace(u' ', '')
                                     val = ''.join(val.split())
                                 else:
                                     val = tag_values[j].text
                                 sheet.write(row, j + 1, val)
                         else:
-                            print n + 1, 'no tr_list return', filepath
+                            print(n + 1, 'no tr_list return', filepath)
                             sheet.write(row, 0, n + 1)
                             sheet.write(row, 1, '?')
                     except Exception as e:
-                        print n + 1, filepath, e
+                        print(n + 1, filepath, e)
                         sheet.write(row, 0, n + 1)
                         sheet.write(row, 1, '?')
                 for k in range(10):
@@ -1095,7 +1095,7 @@ class TaxplayerReader(object):
         :return: 标签的text
         """
         self
-        val = val.text.strip().replace(u'\n', '').replace(u' ', u'')
+        val = val.text.strip().replace(u'\n', '').replace(u' ', '')
         val = ''.join(val.split())
         return val
 
@@ -1107,7 +1107,7 @@ class TaxplayerReader(object):
         """
         self
         if soup:
-            if u': 万元' in soup.text or u':万元' in soup.text or u'：万元' in soup.text or u'： 万元' in soup.text:
+            if ': 万元' in soup.text or ':万元' in soup.text or '：万元' in soup.text or '： 万元' in soup.text:
                 return True
             else:
                 return False
@@ -1130,14 +1130,14 @@ class TaxplayerReader(object):
         wan = False
         keys = []
         positions = []
-        repeat_qsjes = [u'合计', u'截止', u'欠税情况', u'欠税额度（元）', u'欠税余额情况']
-        repeat_fddbrs = [u'法人代表', u'法定代表人或业主']
-        zjhms = [u'证件号码', u'身份证号码', u'法人证件号', u'身份号码', u'（护照）号码', u'身份证号', u'有效证件号',
-                 u'（有效证件）号码']
+        repeat_qsjes = [u'合计', '截止', '欠税情况', '欠税额度（元）', '欠税余额情况']
+        repeat_fddbrs = [u'法人代表', '法定代表人或业主']
+        zjhms = [u'证件号码', '身份证号码', '法人证件号', '身份号码', '（护照）号码', '身份证号', '有效证件号',
+                 '（有效证件）号码']
         filter_nsrmcs = [u'纳税人']
-        dqsjes = [u'新发生', u'新欠', u'新增欠税']
+        dqsjes = [u'新发生', '新欠', '新增欠税']
         filter_qsjes = [u'上期']
-        filter_rqs = [u'日期', u'税款所属期', u'所属期']
+        filter_rqs = [u'日期', '税款所属期', '所属期']
         tr_title = tr_list[0]
         td = tr_title.findAll('td')
         th = tr_title.findAll('th')
@@ -1150,11 +1150,11 @@ class TaxplayerReader(object):
             tags = th
         for i in range(len(tags)):
             val = self.get_tag_val(tags[i])
-            # print 'val', val, len(val)
+            # print('val', val, len(val)
             for fds in range(len(fields)):
                 match_field = fields[fds].values()[0]
                 match_key = fields[fds].keys()[0]
-                # print val, match_order_condition, match_key
+                # print(val, match_order_condition, match_key
                 match_condition = val in match_field and val
                 filter_nsrmc_condition = True in [nsrmc == val for nsrmc in filter_nsrmcs]
                 dqsje_condition = True in [dqsje in val for dqsje in dqsjes]
@@ -1163,52 +1163,52 @@ class TaxplayerReader(object):
                 repeat_fddbr_condition = True in [fddbr == val for fddbr in repeat_fddbrs]
                 zjhm_condition = True in [zjhm in val for zjhm in zjhms]
                 filter_rq_condition = True in [rq == val for rq in filter_rqs]
-                if u'纳税人识别号' in match_field:
+                if '纳税人识别号' in match_field:
                     if match_key not in keys:
-                        if u'纳税人识别号' in val or match_condition and not filter_nsrmc_condition:
+                        if '纳税人识别号' in val or match_condition and not filter_nsrmc_condition:
                             match_fields.append({match_key: i})
                             keys.append(match_key)
                             positions.append(i)
-                elif match_field == u'证件号码':
+                elif match_field == '证件号码':
                     if match_key not in keys:
-                        if zjhm_condition or val == u'身份证':
+                        if zjhm_condition or val == '身份证':
                             match_fields.append({match_key: i})
                             keys.append(match_key)
                             positions.append(i)
-                elif match_field == u'证件种类':
+                elif match_field == '证件种类':
                     if match_key not in keys:
-                        if match_field in val or u'证件类型' in val or u'证件名称' in val:
+                        if match_field in val or '证件类型' in val or '证件名称' in val:
                             match_fields.append({match_key: i})
                             keys.append(match_key)
                             positions.append(i)
-                elif u'法定代表人' in match_field:
+                elif '法定代表人' in match_field:
                     if repeat_fddbr_condition:
                         for t in range(len(temp_tds)):
                             temp_val = self.get_tag_val(temp_tds[t])
                             non_repetition_temp = match_key not in keys
-                            if u'姓名' in temp_val:
+                            if '姓名' in temp_val:
                                 if non_repetition_temp:
                                     match_fields.append({match_key: i + t})
                                     keys.append(match_key)
                                     positions.append(i + t)
-                            elif u'证件名称' in temp_val or u'证件种类' in temp_val or u'证件类型' in temp_val:
+                            elif '证件名称' in temp_val or '证件种类' in temp_val or '证件类型' in temp_val:
                                 if 'zjzl' not in keys:
                                     match_fields.append({'zjzl': i + t})
                                     keys.append('zjzl')
                                     positions.append(i + t)
-                            elif u'证件号码' in temp_val or u'身份证号' in temp_val or u'居民身份证' in temp_val:
+                            elif '证件号码' in temp_val or '身份证号' in temp_val or '居民身份证' in temp_val:
                                 if 'zjhm' not in keys:
                                     match_fields.append({'zjhm': i + t})
                                     keys.append('zjhm')
                                     positions.append(i + t)
-                            elif (u'法定代表' in val or u'法人代表' in val or match_condition) and not zjhm_condition:
+                            elif (u'法定代表' in val or '法人代表' in val or match_condition) and not zjhm_condition:
                                 if non_repetition_temp:
                                     match_fields.append({match_key: i})
                                     keys.append(match_key)
                                     positions.append(i + t)
                     else:
                         if match_key not in keys:
-                            if (u'法定代表' in val or u'法人代表' in val or match_condition) and not zjhm_condition:
+                            if (u'法定代表' in val or '法人代表' in val or match_condition) and not zjhm_condition:
                                 match_fields.append({match_key: i})
                                 keys.append(match_key)
                                 positions.append(i)
@@ -1247,9 +1247,9 @@ class TaxplayerReader(object):
                             match_fields.append({match_key: i})
                             keys.append(match_key)
                             positions.append(i)
-                elif u'欠税余额' in match_field:
+                elif '欠税余额' in match_field:
                     if repeat_qsje_condition:
-                        if u'合计' in val:
+                        if '合计' in val:
                             if match_key not in keys:
                                 match_fields.append({match_key: i})
                                 keys.append(match_key)
@@ -1259,19 +1259,19 @@ class TaxplayerReader(object):
                                 temp_val = self.get_tag_val(temp_tds[t])
                                 dqsje_condition_temp = True in [dqsje in temp_val for dqsje in dqsjes]
                                 non_repetition_temp = match_key not in keys
-                                if u'合计' in temp_val:
+                                if '合计' in temp_val:
                                     if 'qsje' not in keys:
                                         max_position = self.get_max_position(positions, i + t)
                                         match_fields.append({match_key: max_position})
                                         keys.append(match_key)
                                         positions.append(max_position)
                                         break
-                                elif u'税种' in temp_val:
+                                elif '税种' in temp_val:
                                     if 'qssz' not in keys:
                                         match_fields.append({'qssz': i + t})
                                         keys.append('qssz')
                                         positions.append(i + t)
-                                elif temp_val in match_field and u'万元' in temp_val:
+                                elif temp_val in match_field and '万元' in temp_val:
                                     if non_repetition_temp:
                                         max_position = self.get_max_position(positions, i + t)
                                         wan = True
@@ -1291,13 +1291,13 @@ class TaxplayerReader(object):
                                         keys.append('dqsje')
                                         positions.append(max_position)
                             if match_key not in keys:
-                                if match_condition and u'万元' in val:
+                                if match_condition and '万元' in val:
                                     wan = True
                                     max_position = self.get_max_position(positions, i)
                                     match_fields.append({match_key: max_position})
                                     keys.append(match_key)
                                     positions.append(max_position)
-                                elif (match_condition or u'欠税余额' in val) and not dqsje_condition \
+                                elif (match_condition or '欠税余额' in val) and not dqsje_condition \
                                         and not filter_qsje_condition:
                                     max_position = self.get_max_position(positions, i)
                                     match_fields.append({match_key: max_position})
@@ -1306,19 +1306,19 @@ class TaxplayerReader(object):
 
                     else:
                         if match_key not in keys:
-                            if match_condition and u'万元' in val:
+                            if match_condition and '万元' in val:
                                 wan = True
                                 max_position = self.get_max_position(positions, i)
                                 match_fields.append({match_key: max_position})
                                 keys.append(match_key)
                                 positions.append(max_position)
-                            elif (match_condition or u'欠税余额' in val) and not dqsje_condition \
+                            elif (match_condition or '欠税余额' in val) and not dqsje_condition \
                                     and not filter_qsje_condition:
                                 max_position = self.get_max_position(positions, i)
                                 match_fields.append({match_key: max_position})
                                 keys.append(match_key)
                                 positions.append(max_position)
-                elif match_field == u'当期':
+                elif match_field == '当期':
                     if match_key not in keys:
                         if dqsje_condition:
                             max_position = self.get_max_position(positions, i)
@@ -1344,7 +1344,7 @@ class TaxplayerReader(object):
             fields = self.abnormal_fields
         match_fields = []
         keys = []
-        zjhms = [u'证件号码', u'身份证号', u'法人证件号', u'身份号码']
+        zjhms = [u'证件号码', '身份证号', '法人证件号', '身份号码']
         repeat_fddbrs = [u'法定代表人或负责人']
         tr_title = tr_list[0]
         if len(tr_list) >= 2:
@@ -1359,56 +1359,56 @@ class TaxplayerReader(object):
             val = tags[i].text.strip().replace(' ', '')
             val = val.replace(u'\n', '')
             val = ''.join(val.split())
-            # print 'val', val, len(val)
+            # print('val', val, len(val)
             for fds in range(len(fields)):
                 match_field = fields[fds].values()[0]
                 match_key = fields[fds].keys()[0]
                 match_condition = val in match_field and val
                 zjhm_condition = True in [zjhm in val for zjhm in zjhms]
                 repeat_fddbr_condition = True in [fddbr == val for fddbr in repeat_fddbrs]
-                # print val
-                # print match_field, match_key
-                if match_field == u'证件号码':
+                # print(val
+                # print(match_field, match_key
+                if match_field == '证件号码':
                     if match_key not in keys:
                         if zjhm_condition:
                             match_fields.append({match_key: i})
                             keys.append(match_key)
-                elif match_field == u'证件种类':
+                elif match_field == '证件种类':
                     if match_key not in keys:
-                        if match_field in val or u'证件类型' in val or u'证件名称' in val:
+                        if match_field in val or '证件类型' in val or '证件名称' in val:
                             match_fields.append({match_key: i})
                             keys.append(match_key)
-                elif match_field == u'注册地址':
+                elif match_field == '注册地址':
                     if match_key not in keys:
-                        if match_condition and u'注册' in val:
+                        if match_condition and '注册' in val:
                             match_fields.append({match_key: i})
                 # 标题合并单元格判断
-                elif u'法定代表人' in match_field:
+                elif '法定代表人' in match_field:
                     if repeat_fddbr_condition:
                         judge = True
-                        print '@@@@@@@@'
+                      
                         for t in range(len(temp_tds)):
-                            print '##########', len(temp_tds)
+                            print('##########', len(temp_tds))
                             temp_val = self.get_tag_val(temp_tds[t])
-                            if u'姓名' in temp_val:
+                            if '姓名' in temp_val:
                                 if match_key not in keys:
                                     match_fields.append({match_key: i + t})
-                                    print '$$$$$$$$$$$$$', match_fields
+                                    print('$$$$$$$$$$$$$', match_fields)
                                     keys.append(match_key)
-                                    print '!!!!!!!!!!!', keys
-                            elif u'居民身份证或其他有效身份证件号码' in temp_val:
+                                    print('!!!!!!!!!!!', keys)
+                            elif '居民身份证或其他有效身份证件号码' in temp_val:
                                 if 'zjhm' not in keys:
                                     match_fields.append({'zjhm': i + t})
                                     keys.append('zjzl')
                             keys.append(match_key)
                     else:
                         if match_key not in keys:
-                            if u'法定代表人' in val or match_condition and not zjhm_condition:
+                            if '法定代表人' in val or match_condition and not zjhm_condition:
                                 match_fields.append({match_key: i})
                                 keys.append(match_key)
-                # elif u'法定代表人' in match_field:
+                # elif '法定代表人' in match_field:
                 #     if match_key not in keys:
-                #         if u'法定代表人' in val or match_condition and not zjhm_condition:
+                #         if '法定代表人' in val or match_condition and not zjhm_condition:
                 #             match_fields.append({match_key: i})
                 #             keys.append(match_key)
                 elif match_condition:
@@ -1423,7 +1423,6 @@ class TaxplayerReader(object):
         :param val: 原始的日期
         :return: 格式化后的日期
         """
-        self
         val = val.replace('年', '-').replace('月', '-').replace('日', '')
         if '星期' in val:
             val = val.replace('星期', '').replace('一', '').replace('二', '').replace('三', '')
@@ -1475,18 +1474,18 @@ class TaxplayerReader(object):
 
     # 记录日志以及打印每省插入mysql数据库信息
     def log_province(self,province,num_sql_all,num_repetition_all,num_fail_all):
-        self.log(province + u'一共插入' + str(num_sql_all) + u'条')
-        self.log(province + u'一共重复' + str(num_repetition_all) + u'条')
-        self.log(province + u'一共失败' + str(num_fail_all) + u'条')
+        self.log(province + '一共插入' + str(num_sql_all) + '条')
+        self.log(province + '一共重复' + str(num_repetition_all) + '条')
+        self.log(province + '一共失败' + str(num_fail_all) + '条')
 
     def print_chart(self,num_info,num_sql,num_repetition,num_fail):
-        print str(num_info + 1) + u'表插入' + str(num_sql) + u'条'
-        print str(num_info + 1) + u'表重复' + str(num_repetition) + u'条'
-        print str(num_info + 1) + u'表失败' + str(num_fail) + u'条'
+        print(str(num_info + 1) + '表插入' + str(num_sql) + '条')
+        print(str(num_info + 1) + '表重复' + str(num_repetition) + '条')
+        print(str(num_info + 1) + '表失败' + str(num_fail) + '条')
 
 
 
 if __name__ == '__main__':
     reader = TaxplayerReader()
-    # print reader.abnormal_fields[0]['nsrsbh']
+    # print(reader.abnormal_fields[0]['nsrsbh']
     # reader.get_soup()

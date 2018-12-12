@@ -1,5 +1,5 @@
 # coding=utf-8
-import PackageTool
+# import PackageTool
 from tax.taxplayer_reader import TaxplayerReader
 import sys
 import os
@@ -20,7 +20,7 @@ class HuNanTaxplayerReader(TaxplayerReader):
         self.log('abnormal_excel_reader')
         fields = list()
         sql = "SELECT * from taxplayer_filename where title like '%非正常户%' and filename like '%.xls%' " \
-              "and province = '" + self.province.encode('utf8') + "' and last_update_time like " + self.today
+              "and province = '" + self.province + "' and last_update_time like " + self.today
         self.log(sql)
         info = self.get_province_info(sql)
         num_sql_all, num_repetition_all, num_fail_all = 0, 0, 0
@@ -95,7 +95,7 @@ class HuNanTaxplayerReader(TaxplayerReader):
                                 self.log(str(num_info + 1) + sql)
                                 break
             except Exception as e:
-                print e
+                print(e)
                 if '<html' in str(e[0]) or '<!DOCT' in str(e[0]):
                     try:
                         soup = self.get_soup(filepath)
@@ -170,7 +170,7 @@ class HuNanTaxplayerReader(TaxplayerReader):
         self.log('abnormal_html_reader')
         fields = list()
         sql = "SELECT * from taxplayer_filename where title like '%非正常户%' and (filename like '%.doc%' " \
-              "or filename like '%.%htm%') and province = '" + self.province.encode('utf8') + \
+              "or filename like '%.%htm%') and province = '" + self.province + \
               "' and last_update_time like " + self.today
         self.log(sql)
         info = self.get_province_info(sql)
@@ -245,7 +245,7 @@ class HuNanTaxplayerReader(TaxplayerReader):
         self.log('qsgg_excel_reader')
         fields = list()
         sql = "SELECT * from taxplayer_filename where (title like '%欠税%' or title like '%缴%')" \
-              " and filename like '%.xls%' and province = '" + self.province.encode('utf8') + \
+              " and filename like '%.xls%' and province = '" + self.province + \
               "' and last_update_time like " + self.today
         self.log(sql)
         info = self.get_province_info(sql)
@@ -511,7 +511,7 @@ class HuNanTaxplayerReader(TaxplayerReader):
         fields = list()
         sql = "SELECT * from taxplayer_filename where (title like '%欠税%' or title like '%缴%')" \
               " and (filename like '%.doc%' or filename like '%.%htm%') and province = '" \
-              + self.province.encode('utf8') + "' and last_update_time like " + self.today
+              + self.province + "' and last_update_time like " + self.today
         self.log(sql)
         info = self.get_province_info(sql)
         num_sql_all, num_repetition_all, num_fail_all = 0, 0, 0

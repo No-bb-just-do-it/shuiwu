@@ -56,7 +56,7 @@ class HuNan(TaxConfig):
 
             ans = requests.get('http://www.hntax.gov.cn/zhuanti/qsgg/article_list.jsp',params=params,headers=headers)
             # print(ans.content.decode('GBK'))
-            res = BeautifulSoup(ans.text, 'html5lib')
+            res = BeautifulSoup(ans.text, 'html.parser')
             # print(res)
             table = res.find(attrs={'class':'clstbldata'})
             # print(table)
@@ -193,7 +193,7 @@ class HuNan(TaxConfig):
             charset1 = chardet.detect(r_inner.content)['encoding']
             # print(charset1)
             r_inner.encoding = 'gb18030'
-            res_inner = BeautifulSoup(r_inner.text, 'html5lib')
+            res_inner = BeautifulSoup(r_inner.text, 'html.parser')
             res_inner_str = str(res_inner)
             # print(res_inner_str)
             a_tag_inners = re.findall(r'<a.*?href=.*?</a>|<A.*?href=.*?</A>', res_inner_str)
@@ -245,13 +245,14 @@ class HuNan(TaxConfig):
                 # print(r.text)
                 if r.status_code == 200:
                     r.encoding = 'gbk'
-                    res = BeautifulSoup(r.text, 'html5lib')
+                    res = BeautifulSoup(r.text, 'html.parser')
                     box = res.find('ul',{'class':'txtcenm overf'})
                     tag_list = box.find_all('li')
                     # for i in tag_list:
                     #     print(i)
                     return tag_list
-            except:
+            except Exception as e:
+                print(e)
                 return None
 
     def ts(self):
