@@ -40,7 +40,7 @@ class AnHui(TaxConfig):
         }
         titles_before = []
         for q in ['欠税','非正常']:
-            for p in range(0,5):
+            for p in range(1,6):
                 self.last_update_time = time.strftime('%Y-%m-%d %H:%M:%S')
                 print('page:',p)
                 params = {
