@@ -1,5 +1,5 @@
 # coding=utf-8
-import PackageTool
+import All_Programs.JiangSu.PackageTool
 from tax.taxplayer_download import TaxplayerDownload
 from tax.Mysql_Config_Fyh import logger
 from tax.Mysql_Config_Fyh import data_to_mysql
@@ -73,10 +73,10 @@ class JiangSuTaxCrawler(TaxplayerDownload):
                 data = {'appid': '1', 'col': '1', 'columnid': self.coluids[num_source], 'path': '/', 'permissiontype': '0',
                         'unitid': self.unitids[num_source], 'webid': '1', 'webname': '江苏省地方税务局'}
             self.log(region)
-            print region
+            print(region)
             for p in range(50):
                 if self.stop_crawl == True:
-                    print region + u'爬虫结束，页码: ',p
+                    print(region + u'爬虫结束，页码: ',p)
                     break
                 if num_source == 30:
                     url = 'http://xxgk.jsgs.gov.cn/xxgk/jcms_files/jcms1/web1/site/zfxxgk/search.jsp?' \
@@ -105,21 +105,21 @@ class JiangSuTaxCrawler(TaxplayerDownload):
                             url_inner = url_host + href
                         if fbrq <= self.fbrq_stop:
                             self.stop_crawl = True
-                            print u'发布日期爬取到达设定最早日期'
+                            print(u'发布日期爬取到达设定最早日期')
                             break
                         parse_tag = self.parse_tag(num_source, tag,url_host,url_inner,fbrq,log_name,region,title)
                         tasks.append(gevent.spawn(parse_tag))
                     # 通过协程处理每个详情页信息
                     gevent.joinall(tasks)
                 else:
-                    print u'tag_list为空,page_url: ',url
+                    print(u'tag_list为空,page_url: ',url)
                     self.log(u'tag_list为空,page_url:' + url)
                     self.stop_crawl = True
 
     #解析详情页，参数：网站序号，host链接，详情页链接，发布日期，日志名称，行政区域，详情页标题
     def parse_tag(self, num_source, tag,url_host,url_inner,fbrq,log_name,region,title):
         self.log('url_inner: ' + url_inner)
-        print 'url_inner', url_inner
+        print('url_inner', url_inner)
         html_filename = self.get_html_filename(url_inner)
         html_savepath = self.path + '\\' + html_filename
         if u'欠' in title or u'缴' in title or u'非正常户' in title or u'失踪' in title:
@@ -136,7 +136,7 @@ class JiangSuTaxCrawler(TaxplayerDownload):
                     else:
                         download_url = href_inner
                     self.log('download_url: ' + download_url)
-                    print 'download_url', download_url
+                    print('download_url', download_url)
                     # filter_condition = self.check_download_url(download_url)
                     # if filter_condition:
                     filename = self.get_filename(download_url)
