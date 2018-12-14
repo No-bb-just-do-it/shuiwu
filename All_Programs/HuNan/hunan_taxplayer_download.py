@@ -20,18 +20,16 @@ class HuNan(TaxConfig):
     def __init__(self):
         super(HuNan,self).__init__()
         self.session = None
-        self.province = u"湖南省"
+        self.province = "湖南省"
         self.log_name = 'HuNan.log'
         self.path = self.get_savefile_directory('HuNan')
         self.regions = {'长沙市':'cs', '株洲市':'zz', '湘潭市':'xt', '岳阳市':'yy', '衡阳市':'hy', '常德市':'cd', '益阳市':'yy',
                       '邵阳市':'sy', '郴州市':'bz', '永州市':'yz', '娄底市':'ld', '张家界市':'zjj', '怀化市':'hh', '湘西自治州':'xx'}
         # self.xzqy_pys = ['cs', 'zz', 'xt', 'yy', 'hy', 'cd', 'yy', 'sy', 'cz', 'yz', 'ld', 'zjj', 'hh', 'xx']
 
-    # def logger(self,log_name,contents):
-    #     pass
 
     def log(self,message):
-        self.log_download(self.log_name,message)
+        self.log_base(self.log_name,message)
 
     #湖南省税务局欠税信息
     def qs_province(self):
@@ -89,6 +87,7 @@ class HuNan(TaxConfig):
                 # self.cursor.execute(sql)
                 # self.conn.commit()
                 self.save_to_mysql(sql,3,0)
+
     #地级市欠税公告
     def qs_cities(self):
         for region,pinyin in self.regions.items():
@@ -110,7 +109,6 @@ class HuNan(TaxConfig):
                     print(u'无详情页列表信息，爬虫结束')
                     break
                 tag_list_before = tag_list
-                taskList = []
                 tList = []
                 for num,tag in enumerate(tag_list):
                     fbrq = tag.find('em').text.strip()
@@ -184,7 +182,7 @@ class HuNan(TaxConfig):
         html_filename = self.get_html_filename(url_detail)
         html_savepath = os.path.join(self.path,html_filename)
         title = a_tag.get('title')
-        if u'欠' in title or u'缴' in title or u'非正常户' in title or u'失踪' in title:
+        if '欠' in title or '缴' in title or '非正常户' in title or '失踪' in title:
             # url_detail = 'http://www.hhgtax.gov.cn/hhgtax/article_content_xxgk.jsp?id=20181106283800&smallclassid=20180629130174'
 
             r_inner = self.get(url_detail)
@@ -214,8 +212,8 @@ class HuNan(TaxConfig):
                     if os.path.isfile(savepath):
                         self.save_to_mysql(sql,self.log_name,lock=lock)
                     else:
-                        self.log('url_detail: ' + url_detail)
-                        self.log('download_url: ' + download_url)
+                        # self.log('url_detail: ' + url_detail)
+                        # self.log('download_url: ' + download_url)
                         print('download_url', download_url)
                         self.download_file(download_url, filename, savepath)
                         self.save_to_mysql(sql,self.log_name,lock=lock)
@@ -227,7 +225,7 @@ class HuNan(TaxConfig):
 
                     self.save_to_mysql(sql,self.log_name,lock=lock)
                 else:
-                    self.log('url_detail_down_html: ' + url_detail)
+                    # self.log('url_detail_down_html: ' + url_detail)
                     print('url_detail_html ',url_detail)
                     with open(html_savepath, 'w',encoding='utf-8') as f:
                         # print(r_inner.content.decode('gbk'))
@@ -235,7 +233,7 @@ class HuNan(TaxConfig):
 
                     self.save_to_mysql(sql,self.log_name,lock=lock)
 
-
+    #解析列表页，返回tag列表
     def get_tag_list(self,url,params=None,headers=None):
         for t in range(5):
             try:
