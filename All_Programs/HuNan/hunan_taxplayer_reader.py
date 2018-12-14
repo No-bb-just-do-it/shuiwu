@@ -412,7 +412,8 @@ class HuNanTaxplayerReader(TaxplayerReader):
                                     field_keys = 'province,fbrq,last_update_time,'
                                     money_fields = 'cqsje, qsje, dqsje'
                                     rq_fields = 'xjrq,ssqs,ssqz'
-                                    hb_fields = 'nsrsbh, nsrmc, nsrzk, fddbr, zjzl, zjhm, jydz'
+                                    hb_fields = 'nsrsbh, nsrmc, nsrzk, fddbr, zjzl, zjhm, jydz' ···············································1
+
                                     vals = "'" + self.province.encode('utf8') + "','" + fbrq.encode('utf8') + "','" \
                                            + self.last_update_time + "','"
                                     try:
