@@ -63,11 +63,11 @@ class TaxConfig(SpiderMan):
 
     def save_to_mysql(self, sql, log_name = None,lock = None):
         try:
-            # lock.acquire()
+            lock.acquire()
             # print(sql)
             self.cursor.execute(sql)
             self.conn.commit()
-            # lock.release()
+            lock.release()
         except Exception as e:
             # print(e)
             self.log_base(log_name,sql)
