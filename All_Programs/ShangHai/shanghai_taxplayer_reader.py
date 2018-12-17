@@ -1,5 +1,5 @@
 # coding=utf-8
-import PackageTool
+# import PackageTool
 from tax.taxplayer_reader import TaxplayerReader
 import sys
 import os
@@ -15,7 +15,7 @@ class AnHuiTaxplayerReader(TaxplayerReader):
     def __init__(self):
         super(AnHuiTaxplayerReader, self).__init__()
         self.province = u'上海市'
-        self.province_py = 'Shang_Hai'
+        self.province_py = 'ShangHai'
         self.set_config()
         # self.today = "'%2018-01-04%'"
 
@@ -23,7 +23,7 @@ class AnHuiTaxplayerReader(TaxplayerReader):
         self.log('abnormal_excel_reader')
         fields = list()
         sql = "SELECT * from taxplayer_filename where title like '%非正常户%' and filename like '%.xls%' " \
-              "and province = '" + self.province.encode('utf8') + "' and last_update_time like " + self.today
+              "and province = '" + self.province + "' and last_update_time like " + self.today
         # self.log(sql)1
         info = self.get_province_info(sql)
         num_sql_all, num_repetition_all, num_fail_all = 0, 0, 0
@@ -56,8 +56,7 @@ class AnHuiTaxplayerReader(TaxplayerReader):
                         for j in range(start_idx, rows):
                             row_vals = table.row_values(j)
                             field_keys = 'province,region,last_update_time,'
-                            val = "'" + self.province.encode('utf8') + "','" + region.encode(
-                                'utf8') + "','" + self.last_update_time + "','"
+                            val = "'" + self.province + "','" + region + "','" + self.last_update_time + "','"
                             for md in range(len(match_fields)):
                                 key = match_fields[md].keys()[0]
                                 position = match_fields[md].values()[0]
@@ -69,7 +68,7 @@ class AnHuiTaxplayerReader(TaxplayerReader):
                                     field_keys += key + ','
                                 elif key == 'nsrmc':
                                     if row_vals[position].strip():
-                                        val += row_vals[position].encode('utf8') + "','"
+                                        val += row_vals[position] + "','"
                                         field_keys += key + ','
                                 elif isinstance(row_vals[position], float):
                                     val += str(int(row_vals[position])) + "','"

@@ -27,6 +27,7 @@ class SpiderMan(object):
         self.session = requests.session()
 
     def get(self, url, **kwargs):
+        # print('session,',self.session)
         for t in range(self.max_try_times):
             proxy_config = self.get_proxy()
 
@@ -37,11 +38,13 @@ class SpiderMan(object):
             try:
                 if self.session:
                     r = self.session.get(url=url, headers=self.headers,**kwargs)
-                    print(r)
+                    # print(r)
                     if r.status_code != 200:
                         raise StatusCodeException(str(r.status_code))
+                    return r
                 else:
                     r = requests.get(url=url, headers=self.headers,**kwargs)
+                    print(r.content)
                     if r.status_code != 200:
                         raise StatusCodeException(str(r.status_code))
                     return r

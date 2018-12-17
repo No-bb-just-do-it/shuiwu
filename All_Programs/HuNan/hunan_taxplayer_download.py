@@ -222,11 +222,10 @@ class HuNan(TaxConfig):
                       "'%s', '%s')" % (self.province, region, fbrq, title, html_filename, url_detail,
                                        self.last_update_time)
                 if os.path.isfile(html_savepath):
-
                     self.save_to_mysql(sql,self.log_name,lock=lock)
                 else:
                     # self.log('url_detail_down_html: ' + url_detail)
-                    print('url_detail_html ',url_detail)
+                    print('download_html_url ',url_detail)
                     with open(html_savepath, 'w',encoding='utf-8') as f:
                         # print(r_inner.content.decode('gbk'))
                         f.write(r_inner.content.decode(charset1,'ignore'))
