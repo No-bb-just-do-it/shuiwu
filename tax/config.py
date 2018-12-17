@@ -28,7 +28,7 @@ class TaxConfig(SpiderMan):
         :param message:日志信息
         :return:
         """
-        parent_dir = os.path.join(os.path.dirname(__file__), '../logs/readerlogs')
+        parent_dir = os.path.join(os.path.dirname(__file__), '../logs')
         today = time.strftime('%Y-%m-%d')
         # today = '2017-11-29'
         write_time = time.strftime('%H:%M:%S')
@@ -62,48 +62,25 @@ class TaxConfig(SpiderMan):
                 f.write(write_time + '    ' + message + '\n')
 
     def save_to_mysql(self, sql, log_name = None,lock = None):
-        """
-        用来将数据插入到mysql数据库，并记录插入异常，另外返回重复次数。
-        :param sql: 插入语句
-        :param num_repeat: 插入语句执行重复条数
-        :param nun_fail：执行sql失败条数
-        """
-        # for i in range(1):
         try:
             lock.acquire()
+            # print(sql)
             self.cursor.execute(sql)
             self.conn.commit()
             lock.release()
-            # data_nums = [num_repeat, num_fail]
-            # return data_nums
         except Exception as e:
-        #     # print('e',e.args)
-        #     if e.args[0] == 2006:
-        #         time.sleep(2)
-        # #         # data_nums = self.save_to_mysql(sql, num_repeat, num_fail)
-        #         self.save_to_mysql(sql)
-        # #         # return data_nums
+            # print(e)
+            self.log_base(log_name,sql)
+            self.log_base(log_name,e)
             if e.args[0] != 1062:
-        #         # num_fail += 1
-        #         print(sql)
+                print(sql)
                 print(e)
 
-
-
-
-                # self.logger(log_name, 'hunan')
-                # self.logger(log_name, str(e[0]))
-                # self.logger(log_name, sql)
-            # else:
-            #     num_repeat += 1
-            # data_nums = [num_repeat, num_fail]
-            # return data_nums
-
     # 获得需要保存的html文件名
-    def get_html_filename(self, url_inner):
-        html_filename = url_inner.split('/')[-1]
-        if '=' in url_inner:
-            if '.htm' not in url_inner:
+    def get_html_filename(self, url_detail):
+        html_filename = url_detail.split('/')[-1]
+        if '=' in url_detail:
+            if '.htm' not in url_detail:
                 html_filename = html_filename.split('=')[-1] + '.html'
             else:
                 html_filename = html_filename.split('=')[-1]
@@ -121,8 +98,8 @@ class TaxConfig(SpiderMan):
                 href_list.append(href)
         return href_list
 
-    def log_download(self,log_name, message):
-        parent_dir = os.path.join(os.path.dirname(__file__), '../logs/downloadlogs')
+    def log_base(self,log_name, message):
+        parent_dir = os.path.join(os.path.dirname(__file__), '../logs')
         #print('parent_dir', parent_dir)
         today = time.strftime('%Y-%m-%d')
         write_time = time.strftime('%H:%M:%S')
