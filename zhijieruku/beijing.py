@@ -301,12 +301,12 @@ class BeiJingSearcher(TaxConfig):
                 'pageNo': num+1,
                 'pageSize': 100,
                 }
-                response = requests.post('http://www.bjsat.gov.cn/WSBST//FZCHGL_FYServlet', data=postData)
-                # print(response.json()
-                # res = json.loads(response.text)
-
-                # print(json.dumps(json.loads(response.text.replace('\r', '').replace('\n', ''),strict=False), ensure_ascii=False)
                 try:
+                    response = requests.post('http://www.bjsat.gov.cn/WSBST//FZCHGL_FYServlet', data=postData)
+                    # print(response.json()
+                    # res = json.loads(response.text)
+
+                    # print(json.dumps(json.loads(response.text.replace('\r', '').replace('\n', ''),strict=False), ensure_ascii=False)
                     res = json.loads(response.text.strip().replace('\\',''),strict=False)
                     for r in res['arrayList']:
                         try:
