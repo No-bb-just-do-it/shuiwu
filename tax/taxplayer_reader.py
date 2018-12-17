@@ -8,7 +8,7 @@ import win32com
 from win32com.client import Dispatch
 from xlutils.copy import copy
 import re
-
+# from codecs import open
 import bs4
 from bs4 import BeautifulSoup
 
@@ -92,21 +92,21 @@ class TaxplayerReader(object):
 
     def get_abnormal_excel_fieldnames(self):
         sql = "SELECT * from taxplayer_filename where (title like '%非正常户%' or title like '%非正户%') and " \
-              "filename like '%.xls%' and province = '" + self.province.encode('utf8') + \
+              "filename like '%.xls%' and province = '" + self.province + \
               "' and last_update_time like " + self.today
         savepath = self.fieldnames_directory + '\\' + '%s_fields_read.xls' % self.province_py
         self.row = self.read_excel_fieldnames(sql, self.path, savepath, self.row)
 
     def get_abnormal_html_fieldnames(self):
         sql = "SELECT * from taxplayer_filename where (title like '%非正常户%' or title like '%非正户%') and " \
-              "(filename like '%.doc%' or filename like '%.htm%') and province = '" + self.province.encode('utf8') + \
+              "(filename like '%.doc%' or filename like '%.htm%') and province = '" + self.province + \
               "' and last_update_time like " + self.today
         savepath = self.fieldnames_directory + '\\' + '%s_fields_read.xls' % self.province_py
         self.row = self.read_html_field_info(sql, self.path, savepath, self.row)
 
     def get_qsgg_excel_fieldnames(self):
         sql = "SELECT * from taxplayer_filename where (title like '%欠税%' or title like '%缴%')" \
-              " and filename like '%.xls%' and province = '" + self.province.encode('utf8') + \
+              " and filename like '%.xls%' and province = '" + self.province + \
               "' and last_update_time like " + self.today
         savepath = self.fieldnames_directory + '\\' + '%s_fields_read.xls' % self.province_py
         self.row = self.read_excel_fieldnames(sql, self.path, savepath, self.row)
@@ -114,7 +114,7 @@ class TaxplayerReader(object):
     def get_qsgg_html_fieldnames(self):
         sql = "SELECT * from taxplayer_filename where (title like '%欠税%' or title like '%缴%')" \
               " and (filename like '%.doc%' or filename like '%.%htm%') and province = '" \
-              + self.province.encode('utf8') + "' and last_update_time like " + self.today
+              + self.province + "' and last_update_time like " + self.today
         savepath = self.fieldnames_directory + '\\' + '%s_fields_read.xls' % self.province_py
         self.row = self.read_html_field_info(sql, self.path, savepath, self.row)
 
@@ -123,7 +123,7 @@ class TaxplayerReader(object):
             self.conn = my_conn(0)
             self.cursor = self.conn.cursor()
         except Exception as e:
-            if e[0] == 2003:
+            if e.args[0] == 2003:
                 time.sleep(7)
                 self.mysql_conn()
 
@@ -143,21 +143,21 @@ class TaxplayerReader(object):
         :param message:日志信息
         :return:
         """
-        parent_dir = os.path.join(os.path.dirname(__file__), '../logs/readerlogs')
+        parent_dir = os.path.join(os.path.dirname(__file__), '../logs')
         today = time.strftime('%Y-%m-%d')
         # today = '2017-11-29'
         write_time = time.strftime('%H:%M:%S')
         log_directory = os.path.join(parent_dir, today)
         if not os.path.exists(log_directory):
             os.makedirs(log_directory)
-        log_path = log_directory + '\\' + log_name
+        log_path = os.path.join(log_directory, log_name)
         if type(message) == list:
             key = '['
             val = ''
             for m in message:
                 if type(m) == dict:
-                    key += '{' + str(m.keys()[0]) + ': ' + str(m.values()[0]) + '},'
-                    val += str(m.values()[0]) + ','
+                    key += '{' + str(list(m.keys())[0]) + ': ' + str(list(m.values())[0]) + '},'
+                    val += str(list(m.values())[0]) + ','
                 elif type(m) == str:
                     key += m + ','
             key = key[:-1]
@@ -211,16 +211,16 @@ class TaxplayerReader(object):
             data_nums = [num_repeat, num_fail]
             return data_nums
         except Exception as e:
-            if e[0] == 2006:
+            if e.args[0] == 2006:
                 time.sleep(3)
                 data_nums = self.data_to_mysql(sql, num_repeat, num_fail)
                 return data_nums
-            elif e[0] != 1062:
+            elif e.args[0] != 1062:
                 num_fail += 1
                 print(num_info + 1, sql, e)
                 self.logger(log_name, self.province_py)
                 self.logger(log_name, str(num_info + 1))
-                self.logger(log_name, str(e[0]))
+                self.logger(log_name, str(e.args[0]))
                 self.logger(log_name, sql)
             else:
                 num_repeat += 1
@@ -371,8 +371,8 @@ class TaxplayerReader(object):
                                 sheet.write(row, 0, n + 1)
                                 sheet.write(row, 1, '?')
                     except Exception as e:
-                        # if e[0] == "Unsupported format, or corrupt file: Expected BOF record; found '<html xm'":
-                        if '<html' in str(e[0]) or '<!DOCT' in str(e[0]):
+                        # if e.args[0] == "Unsupported format, or corrupt file: Expected BOF record; found '<html xm'":
+                        if '<html' in str(e.args[0]) or '<!DOCT' in str(e.args[0]):
                             row += 1
                             try:
                                 soup = self.get_soup(filepath)
@@ -420,9 +420,9 @@ class TaxplayerReader(object):
         :return: 处理后的数据
         """
         if isinstance(val, float):
-            val = str(val).decode('utf8').replace(u'\n', '').replace(u' ', '')
+            val = str(val).strip().replace(' ', '')
         else:
-            val = val.strip().replace(u'\n', '').replace(u' ', '')
+            val = val.strip().replace(' ', '')
         val = ''.join(val.split())
         return val
 
@@ -482,15 +482,15 @@ class TaxplayerReader(object):
         match_fields = []
         wan = False
         keys = []
-        zjhms = [u'证件号码', '身份证号', '法人证件号', '身份号码', '有效证件号', '法人代表人身份证']
-        repeat_qsjes = [u'截止', '欠税情况', '欠缴地方税金额（单位：元）', '欠税税种及欠税金额']
-        qsjes = [u'欠税余额', '欠税金额',u'欠缴税款金额']
-        dqsjes = [u'当期', '其中', '新增', '新发生', '新欠']
-        filter_rqs = [u'日期', '税款所属期']
+        zjhms = ['证件号码', '身份证号', '法人证件号', '身份号码', '有效证件号', '法人代表人身份证']
+        repeat_qsjes = ['截止', '欠税情况', '欠缴地方税金额（单位：元）', '欠税税种及欠税金额']
+        qsjes = ['欠税余额', '欠税金额','欠缴税款金额']
+        dqsjes = ['当期', '其中', '新增', '新发生', '新欠']
+        filter_rqs = ['日期', '税款所属期']
         rq_keys = ['xjrq', 'ssqs', 'ssqz']
         start_idx = self.get_excel_start_idx(table, rows)
         if start_idx == 0:
-            return match_fields
+            return match_fields,wan
         else:
             j = start_idx - 1
         for col in table.row_values(j):
@@ -505,8 +505,8 @@ class TaxplayerReader(object):
                 val = self.get_row_val(row_val[k])
                 # print('val', val, len(val)
                 for fds in range(len(fields)):
-                    match_field = fields[fds].values()[0]
-                    match_key = fields[fds].keys()[0]
+                    match_field = list(fields[fds].values())[0]
+                    match_key = list(fields[fds].keys())[0]
                     match_condition = val in match_field and val
                     zjhm_condition = True in [zjhm in val for zjhm in zjhms]
                     repeat_qsje_condition = True in [qsje in val for qsje in repeat_qsjes]
@@ -664,14 +664,14 @@ class TaxplayerReader(object):
             row_val = table.row_values(j)
             for k in range(len(row_val)):
                 if isinstance(row_val[k], float):
-                    val = str(row_val[k]).decode('utf8').replace(u'\n', '').replace(u' ', '')
+                    val = str(row_val[k]).strip().replace(' ', '')
                 else:
-                    val = row_val[k].strip().replace(u'\n', '').replace(u' ', '')
+                    val = row_val[k].strip().replace(' ', '')
                 val = ''.join(val.split())
                 # print('val', val, len(val)
                 for fds in range(len(fields)):
-                    match_field = fields[fds].values()[0]
-                    match_key = fields[fds].keys()[0]
+                    match_field = list(fields[fds].values())[0]
+                    match_key = list(fields[fds].keys())[0]
                     match_condition = val in match_field and val
                     zjhm_condition = True in [zjhm in val for zjhm in zjhms]
                     # repeat_fddbr_condtion = True in [fddbr == val for fddbr in repeat_fddbrs]
@@ -700,9 +700,9 @@ class TaxplayerReader(object):
                         temp_vals = table.row_values(j + 1)
                         for t in range(len(temp_vals)):
                             if isinstance(temp_vals[t], float):
-                                temp_val = str(temp_vals[t]).decode('utf8').replace(u'\n', '').replace(u' ', '')
+                                temp_val = str(temp_vals[t]).strip().replace(' ', '')
                             else:
-                                temp_val = temp_vals[t].strip().replace(u'\n', '').replace(u' ', '')
+                                temp_val = temp_vals[t].strip().replace(' ', '')
                             temp_val = ''.join(temp_val.split())
                             zjhm_condition_temp = True in [zjhm in temp_val for zjhm in zjhms]
                             if '姓名' in temp_val and not zjhm_condition_temp:
@@ -791,13 +791,19 @@ class TaxplayerReader(object):
         :param val: 单元格的值
         :return: 单元格值的str的格式
         """
-        if isinstance(val, int):
-            return str(val)
-        elif isinstance(val, float):
-            return str(int(val))
-        else:
-            val = val.encode('utf8').replace(',', '').replace('，', '')
-            return val
+        try:
+            if isinstance(val, int):
+                return str(val)
+            elif isinstance(val, float):
+                return str(int(val))
+            elif isinstance(val,str):
+                return val.replace(',','').replace('，','')
+            else:
+                val = str(val).replace(',', '').replace('，', '')
+                return val
+        except Exception as e:
+            print(e)
+            return None
 
     def get_money_field(self, val, wan=False):
         """
@@ -812,8 +818,7 @@ class TaxplayerReader(object):
                 elif isinstance(val, float):
                     return str(val * 10000)
                 else:
-                    val = val.encode('utf8')
-                    val = val.replace(',', '').replace('元', '').replace('，', '')
+                    val = str(val).replace(',', '').replace('元', '').replace('，', '')
                     return str(float(val) * 10000)
             else:
                 return str(val)
@@ -823,7 +828,7 @@ class TaxplayerReader(object):
             elif isinstance(val, float):
                 return str(val)
             else:
-                val = val.encode('utf8').replace(',', '').replace('元', '').replace('，', '')
+                val = str(val).replace(',', '').replace('元', '').replace('，', '')
                 return val
 
     def get_date(self, table, row, column):
@@ -924,18 +929,28 @@ class TaxplayerReader(object):
         :param decode_way: 解码格式
         :return:
         """
+        # decode_way = None
         try:
-            htmlfile = open(filepath, 'r')  # 以只读的方式打开本地html文件
-        except IOError:
-            return ''
-        else:
-            if decode_way:
-                htmlpage = htmlfile.read().decode(decode_way, 'ignore').encode('utf8')
+            try:
+                htmlfile = open(filepath, 'r',encoding='utf-8')  # 以只读的方式打开本地html文件
+            except IOError:
+                return ''
             else:
-                htmlpage = htmlfile.read()
-            soup = BeautifulSoup(htmlpage, "html.parser")  # 实例化一个BeautifulSoup对象
-            htmlfile.close()
-            return soup
+
+                if decode_way:
+                    print(decode_way)
+                    htmlpage = htmlfile.read().decode(decode_way, 'ignore').encode('utf-8','ignore')
+                else:
+                    htmlpage = htmlfile.read()
+        except Exception as e:
+            print(e)
+            htmlfile = open(filepath, 'rb')  # 以只读的方式打开本地html文件
+            htmlpage = htmlfile.read().decode('utf8','ignore')
+
+
+        soup = BeautifulSoup(htmlpage, "html.parser")  # 实例化一个BeautifulSoup对象
+        htmlfile.close()
+        return soup
 
     def get_html_start_info(self, tr_list):
         """
@@ -1152,8 +1167,8 @@ class TaxplayerReader(object):
             val = self.get_tag_val(tags[i])
             # print('val', val, len(val)
             for fds in range(len(fields)):
-                match_field = fields[fds].values()[0]
-                match_key = fields[fds].keys()[0]
+                match_field = list(fields[fds].values())[0]
+                match_key = list(fields[fds].keys())[0]
                 # print(val, match_order_condition, match_key
                 match_condition = val in match_field and val
                 filter_nsrmc_condition = True in [nsrmc == val for nsrmc in filter_nsrmcs]
@@ -1361,8 +1376,8 @@ class TaxplayerReader(object):
             val = ''.join(val.split())
             # print('val', val, len(val)
             for fds in range(len(fields)):
-                match_field = fields[fds].values()[0]
-                match_key = fields[fds].keys()[0]
+                match_field = list(fields[fds].values())[0]
+                match_key = list(fields[fds].keys())[0]
                 match_condition = val in match_field and val
                 zjhm_condition = True in [zjhm in val for zjhm in zjhms]
                 repeat_fddbr_condition = True in [fddbr == val for fddbr in repeat_fddbrs]
@@ -1460,7 +1475,7 @@ class TaxplayerReader(object):
         else:
             tds = new_tr_list[j].findAll('td')
             td_texts = [td.text.strip() for td in tds]
-        val = td_texts[position].encode('utf8')
+        val = td_texts[position]
         if not val and j > 0:
             j -= 1
             val = self.get_hb_cell_val(j, new_tr_list, position, inner_signal)
