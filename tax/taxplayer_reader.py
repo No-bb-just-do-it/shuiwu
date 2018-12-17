@@ -23,8 +23,8 @@ class TaxplayerReader(object):
         self.abnormal_fields = []
         self.qs_fields = []
         # self.today = "'%2017-09-08%'"
-        self.today = "'%" + time.strftime('%Y-%m-%d') + "%'"
-        # self.today = "'%2018-12-%'"
+        # self.today = "'%" + time.strftime('%Y-%m-%d') + "%'"
+        self.today = "'%2018-12-%'"
         self.last_update_time = time.strftime('%Y-%m-%d %H:%M:%S')
         self.fieldnames_directory = self.get_fieldnames_directory()
         self.row = -1
@@ -78,7 +78,7 @@ class TaxplayerReader(object):
     def log(self, message):
         if self.db_table:
             self.logger(self.test_log_name, message)
-            print(message)
+            # print(message)
         else:
             self.logger(self.log_name, message)
             print(message)
@@ -87,35 +87,35 @@ class TaxplayerReader(object):
         sql = "SELECT * from taxplayer_filename where (title like '%欠税%' or title like '%缴%' or title " \
               "like '%非正常户%' or title like '%非正户%') and filename like '%.doc%' and province = '" + \
               self.province + "' and last_update_time like " + self.today
-        save_directory = self.path + '\word_to_html\\'
+        save_directory =os.path.join(self.path, 'word_to_html')
         self.convert_word_to_html(sql, self.path, save_directory)
 
     def get_abnormal_excel_fieldnames(self):
         sql = "SELECT * from taxplayer_filename where (title like '%非正常户%' or title like '%非正户%') and " \
-              "filename like '%.xls%' and province = '" + self.province.encode('utf8') + \
+              "filename like '%.xls%' and province = '" + self.province + \
               "' and last_update_time like " + self.today
-        savepath = self.fieldnames_directory + '\\' + '%s_fields_read.xls' % self.province_py
+        savepath = os.path.join(self.fieldnames_directory,'%s_fields_read.xls' % self.province_py)
         self.row = self.read_excel_fieldnames(sql, self.path, savepath, self.row)
 
     def get_abnormal_html_fieldnames(self):
         sql = "SELECT * from taxplayer_filename where (title like '%非正常户%' or title like '%非正户%') and " \
-              "(filename like '%.doc%' or filename like '%.htm%') and province = '" + self.province.encode('utf8') + \
+              "(filename like '%.doc%' or filename like '%.htm%') and province = '" + self.province + \
               "' and last_update_time like " + self.today
-        savepath = self.fieldnames_directory + '\\' + '%s_fields_read.xls' % self.province_py
+        savepath = os.path.join(self.fieldnames_directory, '%s_fields_read.xls' % self.province_py)
         self.row = self.read_html_field_info(sql, self.path, savepath, self.row)
 
     def get_qsgg_excel_fieldnames(self):
         sql = "SELECT * from taxplayer_filename where (title like '%欠税%' or title like '%缴%')" \
-              " and filename like '%.xls%' and province = '" + self.province.encode('utf8') + \
+              " and filename like '%.xls%' and province = '" + self.province + \
               "' and last_update_time like " + self.today
-        savepath = self.fieldnames_directory + '\\' + '%s_fields_read.xls' % self.province_py
+        savepath = os.path.join(self.fieldnames_directory,'%s_fields_read.xls' % self.province_py)
         self.row = self.read_excel_fieldnames(sql, self.path, savepath, self.row)
 
     def get_qsgg_html_fieldnames(self):
         sql = "SELECT * from taxplayer_filename where (title like '%欠税%' or title like '%缴%')" \
               " and (filename like '%.doc%' or filename like '%.%htm%') and province = '" \
-              + self.province.encode('utf8') + "' and last_update_time like " + self.today
-        savepath = self.fieldnames_directory + '\\' + '%s_fields_read.xls' % self.province_py
+              + self.province + "' and last_update_time like " + self.today
+        savepath = os.path.join(self.fieldnames_directory,'%s_fields_read.xls' % self.province_py)
         self.row = self.read_html_field_info(sql, self.path, savepath, self.row)
 
     def mysql_conn(self):
@@ -123,7 +123,7 @@ class TaxplayerReader(object):
             self.conn = my_conn(0)
             self.cursor = self.conn.cursor()
         except Exception as e:
-            if e[0] == 2003:
+            if e.args[0] == 2003:
                 time.sleep(7)
                 self.mysql_conn()
 
@@ -143,21 +143,21 @@ class TaxplayerReader(object):
         :param message:日志信息
         :return:
         """
-        parent_dir = os.path.join(os.path.dirname(__file__), '../logs/readerlogs')
+        parent_dir = os.path.join(os.path.dirname(__file__), '../logs')
         today = time.strftime('%Y-%m-%d')
         # today = '2017-11-29'
         write_time = time.strftime('%H:%M:%S')
         log_directory = os.path.join(parent_dir, today)
         if not os.path.exists(log_directory):
             os.makedirs(log_directory)
-        log_path = log_directory + '\\' + log_name
+        log_path = os.path.join(log_directory,log_name)
         if type(message) == list:
             key = '['
             val = ''
             for m in message:
                 if type(m) == dict:
-                    key += '{' + str(m.keys()[0]) + ': ' + str(m.values()[0]) + '},'
-                    val += str(m.values()[0]) + ','
+                    key += '{' + str(list(m.keys())[0]) + ': ' + str(list(m.values())[0]) + '},'
+                    val += str(list(m.values())[0]) + ','
                 elif type(m) == str:
                     key += m + ','
             key = key[:-1]
@@ -172,7 +172,7 @@ class TaxplayerReader(object):
                 f.write(write_time + '    ' + str(message))
         else:
             # if type(message) == unicode:
-            #     message = message.encode('utf8')
+            #     message = message
             with open(log_path, 'a') as f:
                 f.write(write_time + '    ' + message + '\n')
 
@@ -181,17 +181,17 @@ class TaxplayerReader(object):
         :param province_py:省份拼音
         :return: 返回改省份的文件路径
         """
-        parent_dir = os.path.join(os.path.dirname(__file__), '../All_Files')
+        parent_dir = os.path.join(os.path.dirname(__file__), '..\All_Files')
         save_directory = os.path.join(parent_dir, province_py)
         self.get_directory(save_directory)
-        return save_directory + '\\'
+        return save_directory
 
     def get_fieldnames_directory(self):
         """
         :return: 创建并返回日志路径
         """
         today = time.strftime('%Y-%m-%d')
-        parent_dir = os.path.join(os.path.dirname(__file__), '../logs/readerlogs')
+        parent_dir = os.path.join(os.path.dirname(__file__), '../logs')
         log_directory = os.path.join(parent_dir, today)
         self.get_directory(log_directory)
         return log_directory
@@ -211,16 +211,16 @@ class TaxplayerReader(object):
             data_nums = [num_repeat, num_fail]
             return data_nums
         except Exception as e:
-            if e[0] == 2006:
+            if e.args[0] == 2006:
                 time.sleep(3)
                 data_nums = self.data_to_mysql(sql, num_repeat, num_fail)
                 return data_nums
-            elif e[0] != 1062:
+            elif e.args[0] != 1062:
                 num_fail += 1
                 print(num_info + 1, sql, e)
                 self.logger(log_name, self.province_py)
                 self.logger(log_name, str(num_info + 1))
-                self.logger(log_name, str(e[0]))
+                self.logger(log_name, str(e.args[0]))
                 self.logger(log_name, sql)
             else:
                 num_repeat += 1
@@ -248,7 +248,6 @@ class TaxplayerReader(object):
         :param filepath: excel文件路径
         :return: 返回excel对象
         """
-        self
         try:
             excel = xlrd.open_workbook(filepath)
         except:
@@ -323,7 +322,7 @@ class TaxplayerReader(object):
 
         # break
         if True:
-            info = self.cursor.fetch(all)
+            info = self.cursor.fetchall()
             if os.path.isfile(savepath) and row_num == -1:
                 os.remove(savepath)
                 f = xlwt.Workbook(encoding='utf-8')
@@ -343,7 +342,7 @@ class TaxplayerReader(object):
                     sheet = f.add_sheet('fieldnames' + str(t), cell_overwrite_ok=True)
                     sheet.write(row, 0, 'excel')
                 for n in range(0, len(info)):
-                    filepath = file_directory + info[n][4]
+                    filepath = os.path.join(file_directory,info[n][4])
                     try:
                         excel = self.get_excel(filepath)
                         sheets = excel.sheets()
@@ -372,7 +371,7 @@ class TaxplayerReader(object):
                                 sheet.write(row, 1, '?')
                     except Exception as e:
                         # if e[0] == "Unsupported format, or corrupt file: Expected BOF record; found '<html xm'":
-                        if '<html' in str(e[0]) or '<!DOCT' in str(e[0]):
+                        if '<html' in str(e.args[0]) or '<!DOCT' in str(e.args[0]):
                             row += 1
                             try:
                                 soup = self.get_soup(filepath)
@@ -420,9 +419,9 @@ class TaxplayerReader(object):
         :return: 处理后的数据
         """
         if isinstance(val, float):
-            val = str(val).decode('utf8').replace(u'\n', '').replace(u' ', '')
+            val = str(val).replace('\n', '').replace('\' ', '')
         else:
-            val = val.strip().replace(u'\n', '').replace(u' ', '')
+            val = val.strip().replace('\n', '').replace('\' ', '')
         val = ''.join(val.split())
         return val
 
@@ -475,165 +474,170 @@ class TaxplayerReader(object):
         :param fields: 进行匹配的初始字段集。
         :return:
         """
-        dw = self.get_money_dw(table, rows)
-        if not fields:
-            fields = self.qs_fields
-        col_val = []
         match_fields = []
         wan = False
-        keys = []
-        zjhms = [u'证件号码', '身份证号', '法人证件号', '身份号码', '有效证件号', '法人代表人身份证']
-        repeat_qsjes = [u'截止', '欠税情况', '欠缴地方税金额（单位：元）', '欠税税种及欠税金额']
-        qsjes = [u'欠税余额', '欠税金额',u'欠缴税款金额']
-        dqsjes = [u'当期', '其中', '新增', '新发生', '新欠']
-        filter_rqs = [u'日期', '税款所属期']
-        rq_keys = ['xjrq', 'ssqs', 'ssqz']
-        start_idx = self.get_excel_start_idx(table, rows)
-        if start_idx == 0:
-            return match_fields
-        else:
-            j = start_idx - 1
-        for col in table.row_values(j):
-            if isinstance(col, float):
-                col_val.append(col)
-            elif col.strip():
-                col_val.append(col)
-        col_nums = len(col_val)
-        if col_nums > 2:
-            row_val = table.row_values(j)
-            for k in range(len(row_val)):
-                val = self.get_row_val(row_val[k])
-                # print('val', val, len(val)
-                for fds in range(len(fields)):
-                    match_field = fields[fds].values()[0]
-                    match_key = fields[fds].keys()[0]
-                    match_condition = val in match_field and val
-                    zjhm_condition = True in [zjhm in val for zjhm in zjhms]
-                    repeat_qsje_condition = True in [qsje in val for qsje in repeat_qsjes]
-                    qsje_condition = True in [qsje in val for qsje in qsjes]
-                    dqsje_condition = True in [dqsje in val for dqsje in dqsjes]
-                    filter_rq_condition = True in [rq == val for rq in filter_rqs]
-                    if '纳税人识别号' in match_field:
-                        if match_key not in keys:
-                            if '纳税人识别号' in val or match_condition:
-                                match_fields.append({match_key: k})
-                                keys.append(match_key)
-                    elif match_field == '证件种类':
-                        if match_key not in keys:
-                            if match_field in val or '证件类型' in val or '证件名称' in val:
-                                match_fields.append({match_key: k})
-                                keys.append(match_key)
-                    elif match_field == '证件号码':
-                        if match_key not in keys:
-                            if zjhm_condition:
-                                match_fields.append({match_key: k})
-                                keys.append(match_key)
-                    elif match_field == '当期':
-                        if match_key not in keys:
-                            if dqsje_condition:
-                                match_fields.append({match_key: k})
-                                keys.append(match_key)
-                    elif match_key in rq_keys:
-                        if match_key not in keys and not filter_rq_condition:
-                            if match_condition:
-                                match_fields.append({match_key: k})
-                                keys.append(match_key)
-                    elif match_key == 'qssz':
-                        if match_key not in keys and match_condition:
-                            temp_row_vals = table.row_values(j + 1)
-                            if len(temp_row_vals) >= k + 1:
-                                sz_time = self.get_sz_time(temp_row_vals[k: k + 2])
-                            else:
-                                sz_time = 1
-                            if sz_time <= 1:
-                                match_fields.append({match_key: k})
-                                keys.append(match_key)
-                    elif '法定代表人' in match_field:
-                        if match_key not in keys:
-                            temp_row_val = table.row_values(j + 1)
-                            for t in range(len(temp_row_val)):
-                                temp_val = self.get_row_val(temp_row_val[t])
-                                zjhm_condition_temp = True in [zjhm in temp_val for zjhm in zjhms]
-                                if '姓名' in temp_val:
-                                    match_fields.append({match_key: t})
-                                    keys.append(match_key)
-                                elif '证件名称' in temp_val or '证件种类' in temp_val or '证件类型' in temp_val:
-                                    if 'zjzl' not in keys:
-                                        match_fields.append({'zjzl': t})
-                                        keys.append('zjzl')
-                                elif zjhm_condition_temp:
-                                    if 'zjhm' not in keys:
-                                        match_fields.append({'zjhm': t})
-                                        keys.append('zjhm')
+        try:
+        # if True:
+            dw = self.get_money_dw(table, rows)
+            if not fields:
+                fields = self.qs_fields
+            col_val = []
+            keys = []
+            zjhms = [u'证件号码', '身份证号', '法人证件号', '身份号码', '有效证件号', '法人代表人身份证']
+            repeat_qsjes = [u'截止', '欠税情况', '欠缴地方税金额（单位：元）', '欠税税种及欠税金额']
+            qsjes = [u'欠税余额', '欠税金额',u'欠缴税款金额']
+            dqsjes = [u'当期', '其中', '新增', '新发生', '新欠']
+            filter_rqs = [u'日期', '税款所属期']
+            rq_keys = ['xjrq', 'ssqs', 'ssqz']
+            start_idx = self.get_excel_start_idx(table, rows)
+            if start_idx == 0:
+                return match_fields,wan
+            else:
+                j = start_idx - 1
+            for col in table.row_values(j):
+                if isinstance(col, float):
+                    col_val.append(col)
+                elif col.strip():
+                    col_val.append(col)
+            col_nums = len(col_val)
+            if col_nums > 2:
+                row_val = table.row_values(j)
+                for k in range(len(row_val)):
+                    val = self.get_row_val(row_val[k])
+                    # print('val', val, len(val)
+                    for fds in range(len(fields)):
+                        match_field = list(fields[fds].values())[0]
+                        match_key = list(fields[fds].keys())[0]
+                        match_condition = val in match_field and val
+                        zjhm_condition = True in [zjhm in val for zjhm in zjhms]
+                        repeat_qsje_condition = True in [qsje in val for qsje in repeat_qsjes]
+                        qsje_condition = True in [qsje in val for qsje in qsjes]
+                        dqsje_condition = True in [dqsje in val for dqsje in dqsjes]
+                        filter_rq_condition = True in [rq == val for rq in filter_rqs]
+                        if '纳税人识别号' in match_field:
                             if match_key not in keys:
-                                if (u'法定代表' in val or '法人' in val or match_condition) and not zjhm_condition:
+                                if '纳税人识别号' in val or match_condition:
                                     match_fields.append({match_key: k})
                                     keys.append(match_key)
-                    elif '欠税余额' in match_field:
-                        if match_key not in keys:
-                            if '合计' in val:
-                                if match_key not in keys:
+                        elif match_field == '证件种类':
+                            if match_key not in keys:
+                                if match_field in val or '证件类型' in val or '证件名称' in val:
                                     match_fields.append({match_key: k})
                                     keys.append(match_key)
-                            elif repeat_qsje_condition:
+                        elif match_field == '证件号码':
+                            if match_key not in keys:
+                                if zjhm_condition:
+                                    match_fields.append({match_key: k})
+                                    keys.append(match_key)
+                        elif match_field == '当期':
+                            if match_key not in keys:
+                                if dqsje_condition:
+                                    match_fields.append({match_key: k})
+                                    keys.append(match_key)
+                        elif match_key in rq_keys:
+                            if match_key not in keys and not filter_rq_condition:
+                                if match_condition:
+                                    match_fields.append({match_key: k})
+                                    keys.append(match_key)
+                        elif match_key == 'qssz':
+                            if match_key not in keys and match_condition:
                                 temp_row_vals = table.row_values(j + 1)
-                                if len(temp_row_val) >= k:
+                                if len(temp_row_vals) >= k + 1:
                                     sz_time = self.get_sz_time(temp_row_vals[k: k + 2])
                                 else:
                                     sz_time = 1
+                                if sz_time <= 1:
+                                    match_fields.append({match_key: k})
+                                    keys.append(match_key)
+                        elif '法定代表人' in match_field:
+                            if match_key not in keys:
+                                temp_row_val = table.row_values(j + 1)
                                 for t in range(len(temp_row_val)):
                                     temp_val = self.get_row_val(temp_row_val[t])
-                                    dqsje_condition_temp = True in [dqsje in temp_val for dqsje in dqsjes]
-                                    if '税种' in temp_val:
-                                        if 'qssz' not in keys and sz_time <= 1:
-                                            match_fields.append({'qssz': t})
-                                            keys.append('qssz')
-                                    elif '合计' in temp_val:
-                                        if match_key not in keys:
-                                            wan = wan or dw
-                                            match_fields.append({match_key: t})
-                                            keys.append(match_key)
-                                            break
-                                    elif temp_val in match_field and temp_val and '万元' in temp_val:
-                                        if match_key not in keys:
+                                    zjhm_condition_temp = True in [zjhm in temp_val for zjhm in zjhms]
+                                    if '姓名' in temp_val:
+                                        match_fields.append({match_key: t})
+                                        keys.append(match_key)
+                                    elif '证件名称' in temp_val or '证件种类' in temp_val or '证件类型' in temp_val:
+                                        if 'zjzl' not in keys:
+                                            match_fields.append({'zjzl': t})
+                                            keys.append('zjzl')
+                                    elif zjhm_condition_temp:
+                                        if 'zjhm' not in keys:
+                                            match_fields.append({'zjhm': t})
+                                            keys.append('zjhm')
+                                if match_key not in keys:
+                                    if (u'法定代表' in val or '法人' in val or match_condition) and not zjhm_condition:
+                                        match_fields.append({match_key: k})
+                                        keys.append(match_key)
+                        elif '欠税余额' in match_field:
+                            if match_key not in keys:
+                                if '合计' in val:
+                                    if match_key not in keys:
+                                        match_fields.append({match_key: k})
+                                        keys.append(match_key)
+                                elif repeat_qsje_condition:
+                                    temp_row_vals = table.row_values(j + 1)
+                                    if len(temp_row_val) >= k:
+                                        sz_time = self.get_sz_time(temp_row_vals[k: k + 2])
+                                    else:
+                                        sz_time = 1
+                                    for t in range(len(temp_row_val)):
+                                        temp_val = self.get_row_val(temp_row_val[t])
+                                        dqsje_condition_temp = True in [dqsje in temp_val for dqsje in dqsjes]
+                                        if '税种' in temp_val:
+                                            if 'qssz' not in keys and sz_time <= 1:
+                                                match_fields.append({'qssz': t})
+                                                keys.append('qssz')
+                                        elif '合计' in temp_val:
+                                            if match_key not in keys:
+                                                wan = wan or dw
+                                                match_fields.append({match_key: t})
+                                                keys.append(match_key)
+                                                break
+                                        elif temp_val in match_field and temp_val and '万元' in temp_val:
+                                            if match_key not in keys:
+                                                wan = True
+                                                match_fields.append({match_key: t})
+                                                keys.append(match_key)
+                                        elif temp_val in match_field and temp_val:
+                                            if match_key not in keys:
+                                                wan = wan or dw
+                                                match_fields.append({match_key: t})
+                                                keys.append(match_key)
+                                        elif dqsje_condition_temp:
+                                            if 'dqsje' not in keys:
+                                                wan = wan or dw
+                                                match_fields.append({'dqsje': t})
+                                                keys.append('dqsje')
+                                    if match_key not in keys:
+                                        if (match_condition or qsje_condition) and not dqsje_condition and '万元' in val:
                                             wan = True
-                                            match_fields.append({match_key: t})
+                                            match_fields.append({match_key: k})
                                             keys.append(match_key)
-                                    elif temp_val in match_field and temp_val:
-                                        if match_key not in keys:
+                                        elif (match_condition or qsje_condition) and not dqsje_condition:
                                             wan = wan or dw
-                                            match_fields.append({match_key: t})
+                                            match_fields.append({match_key: k})
                                             keys.append(match_key)
-                                    elif dqsje_condition_temp:
-                                        if 'dqsje' not in keys:
+                                else:
+                                    if match_key not in keys:
+                                        if (match_condition or qsje_condition) and not dqsje_condition and '万元' in val:
+                                            wan = True
+                                            match_fields.append({match_key: k})
+                                            keys.append(match_key)
+                                        elif (match_condition or qsje_condition) and not dqsje_condition:
                                             wan = wan or dw
-                                            match_fields.append({'dqsje': t})
-                                            keys.append('dqsje')
-                                if match_key not in keys:
-                                    if (match_condition or qsje_condition) and not dqsje_condition and '万元' in val:
-                                        wan = True
-                                        match_fields.append({match_key: k})
-                                        keys.append(match_key)
-                                    elif (match_condition or qsje_condition) and not dqsje_condition:
-                                        wan = wan or dw
-                                        match_fields.append({match_key: k})
-                                        keys.append(match_key)
-                            else:
-                                if match_key not in keys:
-                                    if (match_condition or qsje_condition) and not dqsje_condition and '万元' in val:
-                                        wan = True
-                                        match_fields.append({match_key: k})
-                                        keys.append(match_key)
-                                    elif (match_condition or qsje_condition) and not dqsje_condition:
-                                        wan = wan or dw
-                                        match_fields.append({match_key: k})
-                                        keys.append(match_key)
-                    elif match_condition:
-                        if match_key not in keys:
-                            match_fields.append({match_key: k})
-                            keys.append(match_key)
-        else:
-            print(col_nums)
+                                            match_fields.append({match_key: k})
+                                            keys.append(match_key)
+                        elif match_condition:
+                            if match_key not in keys:
+                                match_fields.append({match_key: k})
+                                keys.append(match_key)
+            else:
+                print('col_nums',col_nums)
+
+        except Exception as e:
+            return match_fields,wan
         return match_fields, wan
 
     def get_excel_abnormal_field_info(self, table, rows, fields=None):
@@ -670,8 +674,8 @@ class TaxplayerReader(object):
                 val = ''.join(val.split())
                 # print('val', val, len(val)
                 for fds in range(len(fields)):
-                    match_field = fields[fds].values()[0]
-                    match_key = fields[fds].keys()[0]
+                    match_field = list(fields[fds].values())[0]
+                    match_key = list(fields[fds].keys())[0]
                     match_condition = val in match_field and val
                     zjhm_condition = True in [zjhm in val for zjhm in zjhms]
                     # repeat_fddbr_condtion = True in [fddbr == val for fddbr in repeat_fddbrs]
@@ -700,7 +704,7 @@ class TaxplayerReader(object):
                         temp_vals = table.row_values(j + 1)
                         for t in range(len(temp_vals)):
                             if isinstance(temp_vals[t], float):
-                                temp_val = str(temp_vals[t]).decode('utf8').replace(u'\n', '').replace(u' ', '')
+                                temp_val = str(temp_vals[t]).replace(u'\n', '').replace(u' ', '')
                             else:
                                 temp_val = temp_vals[t].strip().replace(u'\n', '').replace(u' ', '')
                             temp_val = ''.join(temp_val.split())
@@ -796,7 +800,7 @@ class TaxplayerReader(object):
         elif isinstance(val, float):
             return str(int(val))
         else:
-            val = val.encode('utf8').replace(',', '').replace('，', '')
+            val = val.replace(',', '').replace('，', '').replace('\'','')
             return val
 
     def get_money_field(self, val, wan=False):
@@ -812,7 +816,7 @@ class TaxplayerReader(object):
                 elif isinstance(val, float):
                     return str(val * 10000)
                 else:
-                    val = val.encode('utf8')
+                    val = val
                     val = val.replace(',', '').replace('元', '').replace('，', '')
                     return str(float(val) * 10000)
             else:
@@ -823,7 +827,7 @@ class TaxplayerReader(object):
             elif isinstance(val, float):
                 return str(val)
             else:
-                val = val.encode('utf8').replace(',', '').replace('元', '').replace('，', '')
+                val = val.replace(',', '').replace('元', '').replace('，', '')
                 return val
 
     def get_date(self, table, row, column):
@@ -844,7 +848,7 @@ class TaxplayerReader(object):
             val = table.cell(row, column).value.strip()
             # if type(val) == unicode:
             #     rq = val.replace(u'年', '-').replace(u'月', '-').replace(u'日', '-')
-            #     rq = rq.encode('utf8')[0:10]
+            #     rq = rq[0:10]
             if len(val) > 9:
                 rq = val[0:10]
             elif len(val) == 8:
@@ -876,12 +880,12 @@ class TaxplayerReader(object):
             return None
         for n in range(0, len(info)):
             w = win32com.client.Dispatch('Word.Application')
-            filepath = file_directory + info[n][4]
+            filepath = os.path.join(file_directory, info[n][4])
             if os.path.isfile(filepath):
                 try:
                     doc = w.Documents.Open(filepath)
                     self.get_directory(save_directory)
-                    savepath = save_directory + info[n][4].split('.')[0] + '.html'
+                    savepath = os.path.join(save_directory,info[n][4].split('.')[0] + '.html')
                     if os.path.isfile(savepath):
                         doc.Close()
                     else:
@@ -900,9 +904,9 @@ class TaxplayerReader(object):
         :return:文件的绝对路径
         """
         if '.doc' in filename or '.DOC' in filename:
-            return file_directory + '\\word_to_html\\' + filename.split('.')[0] + '.html'
+            return os.path.join(file_directory ,'word_to_html', filename.split('.')[0] + '.html')
         else:
-            return file_directory + filename
+            return os.path.join(file_directory,filename)
 
     def get_decode_way(self, filename):
         """
@@ -925,12 +929,12 @@ class TaxplayerReader(object):
         :return:
         """
         try:
-            htmlfile = open(filepath, 'r')  # 以只读的方式打开本地html文件
+            htmlfile = open(filepath, 'r',encoding='utf-8')  # 以只读的方式打开本地html文件
         except IOError:
             return ''
         else:
             if decode_way:
-                htmlpage = htmlfile.read().decode(decode_way, 'ignore').encode('utf8')
+                htmlpage = htmlfile.read().decode(decode_way, 'ignore')
             else:
                 htmlpage = htmlfile.read()
             soup = BeautifulSoup(htmlpage, "html.parser")  # 实例化一个BeautifulSoup对象
@@ -1152,8 +1156,8 @@ class TaxplayerReader(object):
             val = self.get_tag_val(tags[i])
             # print('val', val, len(val)
             for fds in range(len(fields)):
-                match_field = fields[fds].values()[0]
-                match_key = fields[fds].keys()[0]
+                match_field = list(fields[fds].values())[0]
+                match_key = list(fields[fds].keys())[0]
                 # print(val, match_order_condition, match_key
                 match_condition = val in match_field and val
                 filter_nsrmc_condition = True in [nsrmc == val for nsrmc in filter_nsrmcs]
@@ -1361,8 +1365,8 @@ class TaxplayerReader(object):
             val = ''.join(val.split())
             # print('val', val, len(val)
             for fds in range(len(fields)):
-                match_field = fields[fds].values()[0]
-                match_key = fields[fds].keys()[0]
+                match_field = list(fields[fds].values())[0]
+                match_key = list(fields[fds].keys())[0]
                 match_condition = val in match_field and val
                 zjhm_condition = True in [zjhm in val for zjhm in zjhms]
                 repeat_fddbr_condition = True in [fddbr == val for fddbr in repeat_fddbrs]
@@ -1460,7 +1464,7 @@ class TaxplayerReader(object):
         else:
             tds = new_tr_list[j].findAll('td')
             td_texts = [td.text.strip() for td in tds]
-        val = td_texts[position].encode('utf8')
+        val = td_texts[position]
         if not val and j > 0:
             j -= 1
             val = self.get_hb_cell_val(j, new_tr_list, position, inner_signal)
