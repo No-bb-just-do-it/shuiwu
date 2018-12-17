@@ -8,6 +8,9 @@ import re
 from codecs import open
 import chardet
 from threading import Lock
+import traceback
+import sys
+
 class TaxConfig(SpiderMan):
     def __init__(self):
         super(TaxConfig,self).__init__()
@@ -72,6 +75,9 @@ class TaxConfig(SpiderMan):
             # self.conn.close()
             # lock.release()
         except Exception as e:
+            # exType, exValue, exTrace = sys.exc_info()
+            # print(exType, exValue, sep="\n")
+            # print(traceback.print_tb(exTrace))
             # print(sql)
             # print(e.args[0])
             # print(e)
@@ -81,6 +87,9 @@ class TaxConfig(SpiderMan):
                 time.sleep(1)
                 self.save_to_mysql(sql)
             if e.args[0] != 1062:
+                # exType, exValue, exTrace = sys.exc_info()
+                # print(exType, exValue, sep="\n")
+                # print(traceback.print_tb(exTrace))
                 print(sql)
                 print(e)
 
@@ -161,7 +170,7 @@ class TaxConfig(SpiderMan):
             except Exception as e:
                 print(e)
                 if k == 4:
-                    print(u'下载失败:', download_url)
+                    print('下载失败:', download_url)
                     # logger('download_url','下载失败')
 
                 # else:
