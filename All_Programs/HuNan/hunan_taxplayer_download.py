@@ -241,6 +241,8 @@ class HuNan(TaxConfig):
                 # r1 = requests.get(url,params=params,headers=headers)
                 # print(r1.content)
                 # print(r.text)
+                if not r:
+                    return
                 if r.status_code == 200:
                     r.encoding = 'gbk'
                     res = BeautifulSoup(r.text, 'html.parser')
@@ -260,6 +262,6 @@ class HuNan(TaxConfig):
 if __name__ == '__main__':
     hunan = HuNan()
     # hunan.qs_province()
-    # hunan.abnormal_cities()
+    hunan.abnormal_cities()
     hunan.qs_cities()
     # hunan.ts()
