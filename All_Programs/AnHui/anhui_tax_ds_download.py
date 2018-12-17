@@ -1,5 +1,5 @@
 # coding=utf-8
-import PackageTool
+# import PackageTool
 from tax.taxplayer_download import TaxplayerDownload
 from tax.Mysql_Config_Fyh import logger
 from tax.Mysql_Config_Fyh import data_to_mysql
@@ -103,7 +103,7 @@ class AnHuiTaxCrawler(TaxplayerDownload):
                             fbrq = fbrq[0]
                         if fbrq <= self.fbrq_stop:
                             self.stop_crawl = True
-                            print u'发布日期爬取到达设定最早日期'
+                            print(u'发布日期爬取到达设定最早日期')
                             break
 
                         parse_tag = self.parse_tag(num_source, tag,url_host,url_source,fbrq,log_name,region)
@@ -111,7 +111,7 @@ class AnHuiTaxCrawler(TaxplayerDownload):
                     # 通过协程处理每个详情页信息
                     gevent.joinall(tasks)
                 else:
-                    print u'tag_list为空,page_url: ',url
+                    print(u'tag_list为空,page_url: ',url)
                     self.log(u'tag_list为空,page_url:' + url)
                     self.stop_crawl = False
 
@@ -121,7 +121,7 @@ class AnHuiTaxCrawler(TaxplayerDownload):
         href = a_tag.get('href')
         url_inner = url_host + href
         self.log('url_inner: ' + url_inner)
-        print 'url_inner', url_inner
+        print('url_inner', url_inner)
         html_filename = self.get_html_filename(url_inner)
         html_savepath = self.path + '\\' + html_filename
         title = a_tag.text.strip()

@@ -80,13 +80,13 @@ class HuNan(TaxConfig):
                 # print(nsrmc)
 
                 sql = "insert into taxplayer_qsgg (province,nsrsbh,nsrmc,fddbr,qssz,qsje,dqsje,zjzl,zjhm,jydz,fbrq,last_update_time) values (" \
-                      "'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (self.province.encode('utf8'),nsrsbh.encode('utf8'),nsrmc.encode('utf8'), \
-                      fddbrxm.encode('utf8'),qssz.encode('utf8'),qsye.encode('utf8'),dqqsje.encode('utf8'),zjlx.encode('utf8'), \
-                      zjhm.encode('utf8'),jydd.encode('utf8'),fbsj.encode('utf8'),last_update_time.encode('utf8'))
+                      "'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (self.province,nsrsbh,nsrmc, \
+                      fddbrxm,qssz,qsye,dqqsje,zjlx, \
+                      zjhm,jydd,fbsj,last_update_time)
                 # print(sql)
                 # self.cursor.execute(sql)
                 # self.conn.commit()
-                self.save_to_mysql(sql,3,0)
+                self.save_to_mysql(sql,log_name=self.log_name)
 
     #地级市欠税公告
     def qs_cities(self):
@@ -106,7 +106,7 @@ class HuNan(TaxConfig):
                     }
                 tag_list = self.get_tag_list(url_start,params=params)
                 if not tag_list or tag_list_before == tag_list:
-                    print(u'无详情页列表信息，爬虫结束')
+                    print('无详情页列表信息，爬虫结束')
                     break
                 tag_list_before = tag_list
                 tList = []
@@ -116,7 +116,7 @@ class HuNan(TaxConfig):
                         continue
                     if fbrq <= self.fbrq_stop:
                         self.stop_crawl = True
-                        print(u'发布日期爬取到达设定最早日期')
+                        print('发布日期爬取到达设定最早日期')
                         break
                     print(tag.text)
                     # parse_tag = self.parse_detail(tag,url_host,url_source,fbrq,region)
@@ -241,8 +241,6 @@ class HuNan(TaxConfig):
                 # r1 = requests.get(url,params=params,headers=headers)
                 # print(r1.content)
                 # print(r.text)
-                if not r:
-                    return
                 if r.status_code == 200:
                     r.encoding = 'gbk'
                     res = BeautifulSoup(r.text, 'html.parser')
@@ -263,5 +261,5 @@ if __name__ == '__main__':
     hunan = HuNan()
     # hunan.qs_province()
     hunan.abnormal_cities()
-    hunan.qs_cities()
+    # hunan.qs_cities()
     # hunan.ts()
