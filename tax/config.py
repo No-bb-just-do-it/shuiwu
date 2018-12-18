@@ -17,11 +17,17 @@ class TaxConfig(SpiderMan):
         self.fbrq_stop = '2018-01-01'
         self.conn = None
         self.cursor = None
+        # self.test = True
+        self.test = False
         self.my_conn()
 
     def my_conn(self):
-        self.conn = mysql.connector.connect(host='172.16.0.76', port=3306,
-                    user='fengyuanhua', passwd='!@#qweASD', db='taxplayer',charset='utf8')
+        if self.test:
+            self.conn = mysql.connector.connect(host='172.16.0.76', port=3306,
+                        user='fengyuanhua', passwd='!@#qweASD', db='shuiwu',charset='utf8')
+        else:
+            self.conn = mysql.connector.connect(host='172.16.0.76', port=3306,
+                        user='fengyuanhua', passwd='!@#qweASD', db='taxplayer',charset='utf8')
         self.cursor = self.conn.cursor()
 
     def log_read(self, log_name, message):
@@ -87,9 +93,9 @@ class TaxConfig(SpiderMan):
                 time.sleep(1)
                 self.save_to_mysql(sql)
             if e.args[0] != 1062:
-                # exType, exValue, exTrace = sys.exc_info()
-                # print(exType, exValue, sep="\n")
-                # print(traceback.print_tb(exTrace))
+                exType, exValue, exTrace = sys.exc_info()
+                print(exType, exValue, sep="\n")
+                print(traceback.print_tb(exTrace))
                 print(sql)
                 print(e)
 

@@ -44,7 +44,7 @@ class SpiderMan(object):
                     return r
                 else:
                     r = requests.get(url=url, headers=self.headers,**kwargs)
-                    print(r.content)
+                    # print(r.content)
                     if r.status_code != 200:
                         raise StatusCodeException(str(r.status_code))
                     return r
