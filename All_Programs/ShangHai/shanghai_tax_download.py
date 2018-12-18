@@ -113,6 +113,7 @@ class ShangHaiTaxplayerCrawler(TaxConfig):
 
                         # parse_tag = self.parse_detail(num_source, tag,url_host,url_source,fbrq,log_name,region)
                         t = threading.Thread(target=self.parse_detail, args=(tag, url_host, url_source, fbrq, log_name, region))
+                        t.daemon = True
                         tList.append(t)
                     for t in tList:
                         t.start()

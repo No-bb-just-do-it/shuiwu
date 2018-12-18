@@ -24,7 +24,7 @@ class TaxplayerReader(object):
         self.qs_fields = []
         # self.today = "'%2017-09-08%'"
         # self.today = "'%" + time.strftime('%Y-%m-%d') + "%'"
-        self.today = "'%2018-12-%'"
+        self.today = "'%2018-12%'"
         self.last_update_time = time.strftime('%Y-%m-%d %H:%M:%S')
         self.fieldnames_directory = self.get_fieldnames_directory()
         self.row = -1
@@ -299,7 +299,7 @@ class TaxplayerReader(object):
                     col_val += str(col)
                 elif col.strip():
                     col_val += col.strip()
-            match_fields = [u'纳税人识别号', '纳税人名称', '纳税人识别码', '税务登记号码', '企业或单位名称',
+            match_fields = ['纳税人识别号', '纳税人名称', '纳税人识别码', '税务登记号码', '企业或单位名称',
                             '税务登记证号', '税务登记号', '纳税识别号', '纳税人名称', '业户名称', '企业名称',
                             '经营地点']
             match_condition = True in [match_field in col_val for match_field in match_fields]
@@ -483,11 +483,11 @@ class TaxplayerReader(object):
                 fields = self.qs_fields
             col_val = []
             keys = []
-            zjhms = [u'证件号码', '身份证号', '法人证件号', '身份号码', '有效证件号', '法人代表人身份证']
+            zjhms = ['证件号码', '身份证号', '法人证件号', '身份号码', '有效证件号', '法人代表人身份证']
             repeat_qsjes = [u'截止', '欠税情况', '欠缴地方税金额（单位：元）', '欠税税种及欠税金额']
-            qsjes = [u'欠税余额', '欠税金额',u'欠缴税款金额']
-            dqsjes = [u'当期', '其中', '新增', '新发生', '新欠']
-            filter_rqs = [u'日期', '税款所属期']
+            qsjes = ['欠税余额', '欠税金额','欠缴税款金额']
+            dqsjes = ['当期', '其中', '新增', '新发生', '新欠']
+            filter_rqs = ['日期', '税款所属期']
             rq_keys = ['xjrq', 'ssqs', 'ssqz']
             start_idx = self.get_excel_start_idx(table, rows)
             if start_idx == 0:
@@ -928,15 +928,23 @@ class TaxplayerReader(object):
         :param decode_way: 解码格式
         :return:
         """
+        decode_way =None
         try:
             htmlfile = open(filepath, 'r',encoding='utf-8')  # 以只读的方式打开本地html文件
         except IOError:
             return ''
         else:
-            if decode_way:
-                htmlpage = htmlfile.read().decode(decode_way, 'ignore')
-            else:
+            try:
+                if decode_way:
+                    htmlpage = htmlfile.read().decode(decode_way, 'ignore')
+                else:
+                    htmlpage = htmlfile.read()
+            except UnicodeDecodeError:
+                htmlfile.close()
+                htmlfile = open(filepath, 'rb')
+                print('333')
                 htmlpage = htmlfile.read()
+                print('444')
             soup = BeautifulSoup(htmlpage, "html.parser")  # 实例化一个BeautifulSoup对象
             htmlfile.close()
             return soup
