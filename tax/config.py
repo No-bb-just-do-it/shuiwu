@@ -73,13 +73,15 @@ class TaxConfig(SpiderMan):
     def save_to_mysql(self, sql, log_name = None,lock = None):
         try:
             # print(sql)
-            # lock.acquire()
+            if lock:
+                lock.acquire()
             # print(sql)
             # conn =
             self.cursor.execute(sql)
             self.conn.commit()
             # self.conn.close()
-            # lock.release()
+            if lock:
+                lock.release()
         except Exception as e:
             # exType, exValue, exTrace = sys.exc_info()
             # print(exType, exValue, sep="\n")
@@ -89,13 +91,15 @@ class TaxConfig(SpiderMan):
             # print(e)
             self.log_base(log_name,sql)
             self.log_base(log_name,e)
+            # print(e.args)
             if e.args[0] == 2006:
-                time.sleep(1)
+                time.sleep(2)
                 self.save_to_mysql(sql)
             if e.args[0] != 1062:
-                exType, exValue, exTrace = sys.exc_info()
-                print(exType, exValue, sep="\n")
-                print(traceback.print_tb(exTrace))
+                print(e.args[0])
+                # exType, exValue, exTrace = sys.exc_info()
+                # print(exType, exValue, sep="\n")
+                # print(traceback.print_tb(exTrace))
                 print(sql)
                 print(e)
 
@@ -158,13 +162,13 @@ class TaxConfig(SpiderMan):
             try:
                 fs = self.get(download_url, timeout=15)
                 # print(fs)
-                if fs.status_code == 200:
+                if fs and fs.status_code == 200:
                     pattern = 'http://.*?' + filename
                     download_url_news = re.findall(pattern, str(fs.content))
                     # print('download_url_news',download_url_news)
                     if download_url_news:
                         fs_new = self.get(download_url_news[0], timeout=15)
-                        if fs_new.status_code == 200:
+                        if  fs_new and fs_new.status_code == 200:
                             download_url_content = fs_new.content
                         else:
                             download_url_content = ''

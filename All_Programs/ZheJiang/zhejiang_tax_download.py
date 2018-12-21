@@ -50,6 +50,8 @@ class ZheJiang(TaxConfig):
                 'pg':12,
                 'p': p,
                 'q':q,
+                # 'date': 20171218,
+                # 'date': 20181218,
                 }
                 url_start = 'http://www.zjtax.gov.cn/jrobot/search.do'
                 # for t in titles:
@@ -72,10 +74,12 @@ class ZheJiang(TaxConfig):
                     if not fbrq:
                         continue
                     fbrq = fbrq.replace('-','').replace(' ','').replace('年','-').replace('月','-').replace('日','')
-                    if fbrq <= self.fbrq_stop:
-                        self.stop_crawl = True
-                        print(u'发布日期爬取到达设定最早日期')
-                        break
+                    # print(fbrq)
+                    # if fbrq <= self.fbrq_stop:
+                    #     print('fbrq ',fbrq)
+                    #     self.stop_crawl = True
+                    #     print('发布日期爬取到达设定最早日期')
+                    #     break
                     # print(fbrq)
                     # parse_detail = self.parse_detail(title,url_host=url_host,fbrq=fbrq)
                     t = threading.Thread(target=self.parse_detail, args=(title, url_host, fbrq))
@@ -89,13 +93,14 @@ class ZheJiang(TaxConfig):
 
     #解析列表页，返回title列表
     def get_titles(self,url,params=None,headers=None):
+        last_update_time = time.strftime('%Y-%m-%d %H:%M:%S')
         for t in range(5):
             try:
                 r = self.get(url,params=params)
                 # r1 = requests.get(url,params=params,headers=headers)
                 # print(r1.content)
                 # print(r.text)
-                if r.status_code == 200:
+                if r and r.status_code == 200:
                     # r.encoding = 'gbk'
                     res = BeautifulSoup(r.text, 'html.parser')
                     title_list = res.find_all(attrs={'class': 'jsearch-result-box'})
@@ -108,6 +113,7 @@ class ZheJiang(TaxConfig):
 
     #解析详情页
     def parse_detail(self, title,url_host,fbrq):
+        last_update_time = time.strftime('%Y-%m-%d %H:%M:%S')
         div_url = title.find(attrs={'class':'jsearch-result-url'})
         # print('div_url  ',div_url)
         a = div_url.find('a')
@@ -148,26 +154,26 @@ class ZheJiang(TaxConfig):
                     savepath = os.path.join(self.path, filename)
                     sql = "INSERT into taxplayer_filename VALUES('%s', '%s', '%s', '%s', " \
                           "'%s', '%s', '%s')" % (self.province, '',fbrq, titleText, filename,
-                                                 download_url, self.last_update_time)
+                                                 download_url, last_update_time)
                     if os.path.isfile(savepath):
-                        self.save_to_mysql(sql,self.log_name,lock=lock)
+                        self.save_to_mysql(sql,self.log_name,lock)
                     else:
                         # self.log('url_detail: ' + url_detail)
                         # self.log('download_url: ' + download_url)
                         print('download_url', download_url)
                         self.download_file(download_url, filename, savepath)
-                        self.save_to_mysql(sql,self.log_name,lock=lock)
+                        self.save_to_mysql(sql,self.log_name,lock)
             else:
                 sql = "INSERT into taxplayer_filename VALUES('%s', '%s', '%s', '%s', '%s', " \
                       "'%s', '%s')" % (self.province, '',fbrq, titleText, html_filename, url_detail,
-                                       self.last_update_time)
+                                       last_update_time)
                 if os.path.isfile(html_savepath):
 
-                    self.save_to_mysql(sql,self.log_name,lock=lock)
+                    self.save_to_mysql(sql,self.log_name,lock)
                 else:
                     # self.log('url_detail_down_html: ' + url_detail)
                     print('url_detail_html ',url_detail)
-                    with open(html_savepath, 'w',encoding='utf-8') as f:
+                    with open(html_savepath, 'w',encoding='utf8') as f:
                         # print(r_inner.content.decode('gbk'))
                         f.write(r_inner.content.decode(charset1,'ignore'))
 

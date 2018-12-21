@@ -326,7 +326,7 @@ class BeiJingSearcher(TaxConfig):
                                   "'%s','%s','%s','%s','%s','%s')" % \
                                   (province, region, nsrsbh, nsrmc, fddbr, '居民身份证', zjhm, jydz, rdrq, fbrq, last_update_time)
                             # print(len(tds)
-                            self.save_to_mysql(sql,self.log_name)
+                            self.save_to_mysql(sql,self.log_name,)
                         except Exception as e:
                             print(e)
                 except Exception as e:
@@ -337,3 +337,7 @@ if __name__ == '__main__':
     searcher = BeiJingSearcher()
     # searcher.run()
     searcher.run_fzch()
+
+
+
+

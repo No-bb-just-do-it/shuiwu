@@ -75,6 +75,17 @@ class TaxplayerReader(object):
 
         ]
 
+    def  jud1ge_contain_chinese(self,s):
+
+        zhmodel = re.compile(u'[\u4e00-\u9fa5]')  # 检查中文
+        # zhmodel = re.compile(u'[^\u4e00-\u9fa5]')   #检查非中文
+        match = zhmodel.search(s)
+        if match:
+            return True
+        else:
+            return False
+
+
     def log(self, message):
         if self.db_table:
             self.logger(self.test_log_name, message)
@@ -740,7 +751,6 @@ class TaxplayerReader(object):
         :param table: excel的一个sheet表
         :return: 返回sheet表起始行开始后前两列的合并单元格
         """
-        self
         new_merge_cells = []
         merge_cells = table.merged_cells
         merge_cells.sort()

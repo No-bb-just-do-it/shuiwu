@@ -12,7 +12,7 @@ import traceback
 class ZheJiangTaxplayerReader(TaxplayerReader):
     def __init__(self):
         super(ZheJiangTaxplayerReader, self).__init__()
-        self.province = u'浙江省'
+        self.province = '浙江省'
         self.province_py = 'ZheJiang'
         self.set_config()
         # self.today = "'%2017-11-29%'"
@@ -255,9 +255,9 @@ class ZheJiangTaxplayerReader(TaxplayerReader):
             region = info[num_info][1]
             fbrq = info[num_info][2]
             if '.xls' in info[num_info][4]:
-                filepath = self.path + info[num_info][4]
+                filepath = os.path.join(self.path,info[num_info][4])
             else:
-                filepath = self.path + info[num_info][4].split('.')[0] + '.xls'
+                filepath = os.path.join(self.path,info[num_info][4].split('.')[0] + '.xls')
             try:
                 excel = self.get_excel(filepath)
                 sheets = excel.sheets()
@@ -267,6 +267,7 @@ class ZheJiangTaxplayerReader(TaxplayerReader):
                         table = excel.sheets()[m]
                         rows = table.nrows
                         match_fields, wan = self.get_excel_qsgg_field_info(table, rows, fields)
+                        # print(match_fields)
                         # special = [25, 26, 45, 56, 57]
                         # if n + 1 in special:
                         #     match_fields = [{'nsrmc': 0}, {'nsrsbh': 1}, {'fddbr': 2}, {'jydz': 3}, {'qssz': 4},
@@ -278,7 +279,7 @@ class ZheJiangTaxplayerReader(TaxplayerReader):
                             continue
                         else:
                             self.log(str(num_info+1) + 'filepath  ' + filepath)
-                            self.log(u"读欠税公告excel字段信息错误（get_excel_qsgg_field_info):e:"  + str(e))
+                            self.log("读欠税公告excel字段信息错误（get_excel_qsgg_field_info):e:"  + str(e))
                     else:
                         if match_fields:
                             self.log(num_info + 1)
@@ -286,15 +287,14 @@ class ZheJiangTaxplayerReader(TaxplayerReader):
                             if len(match_fields) < 3:
                                 continue
                             keys = [list(match_field.keys())[0] for match_field in match_fields]
-                            cqsje_condition = 'dqsje' in keys and 'cqsje' in keys
                             if 'nsrsbh' not in keys or 'nsrmc' not in keys:
+                                print(keys)
                                 self.log(str(num_info+1) + '  nsrsbh or nsrmc not in keys  ' +  info[num_info][4])
-                            if 'qsje' not in keys and not cqsje_condition:
-                                self.log(str(num_info + 1) + '  qsje not in keys and not cqsje_condition  ' +\
+                                continue
+                            if 'qsje' not in keys and  'dqsje' not in keys and 'cqsje' not in keys:
+                                self.log(str(num_info + 1) + '  qsje not in keys  ' +\
                                          str(info[num_info][4]))
                                 continue
-                            self.log(str(num_info + 1) + '  qsje not in keys and not cqsje_condition  ' +\
-                                     str(info[num_info][4]))
                             start_idx = self.get_excel_start_idx(table, rows)
                             merge_cells = self.get_merge_cells(start_idx, table)
                             int_fields = 'nsrsbh,zjhm,sfzhm'
@@ -354,7 +354,7 @@ class ZheJiangTaxplayerReader(TaxplayerReader):
                                         field_keys += key + ','
                                         keys.append(key)
                                     elif key == 'qssz':
-                                        if u'小计' in row_val_new or u'合计' in row_val_new or u'总和' in row_val_new:
+                                        if '小计' in row_val_new or '合计' in row_val_new or '总和' in row_val_new:
                                             break
                                         else:
                                             val += row_val_new.strip() + "','"
@@ -403,6 +403,7 @@ class ZheJiangTaxplayerReader(TaxplayerReader):
                                 keys = [list(match_field.keys())[0] for match_field in match_fields]
                                 cqsje_condition = 'dqsje' in keys and 'cqsje' in keys
                                 if 'nsrsbh' not in keys or 'nsrmc' not in keys:
+                                    print(keys)
                                     self.log(str(num_info+1) + '  nsrsbh or nsrmc not in keys  ' + info[num_info][4])
                                 if not cqsje_condition and 'qsje' not in keys:
                                     self.log(str(num_info + 1) + '  qsje not in keys and mot cqsje_condition  ' + str(info[num_info][4]))
@@ -431,7 +432,7 @@ class ZheJiangTaxplayerReader(TaxplayerReader):
                                                 if key in money_fields:
                                                     temp_val = td_texts[position]
                                                     qsje_condition = key == 'qsje' and not temp_val
-                                                    if (not re.findall(u'\d+', temp_val) and temp_val != u'') \
+                                                    if (not re.findall(u'\d+', temp_val) and temp_val != '') \
                                                             or qsje_condition:
                                                         break
                                                     val = temp_val
@@ -639,9 +640,9 @@ class ZheJiangTaxplayerReader(TaxplayerReader):
                             print(num_info + 1, sql)
                             break
                 else:
-                    self.log(str(num_info + 1) + u'没有match_fields')
+                    self.log(str(num_info + 1) + '没有match_fields')
             else:
-                self.log(str(num_info + 1) + u'没有tr_list')
+                self.log(str(num_info + 1) + '没有tr_list')
             self.print_chart(num_info,num_sql,num_repetition,num_fail)
             num_sql_all += num_sql
             num_repetition_all += num_repetition
