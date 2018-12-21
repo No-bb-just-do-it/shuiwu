@@ -26,7 +26,7 @@ class AnHui(TaxConfig):
         self.log_base(self.log_name,message)
 
     #安徽省税务局欠税信息
-    def qs_province(self):
+    def qs_abnormal_province(self):
         url_host = 'http://www.ah-n-tax.gov.cn'
         headers = {
         'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
@@ -174,4 +174,4 @@ class AnHui(TaxConfig):
 
 if __name__ == '__main__':
     anhui = AnHui()
-    anhui.qs_province()
+    anhui.qs_abnormal_province()
