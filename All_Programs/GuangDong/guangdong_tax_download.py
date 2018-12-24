@@ -1,5 +1,5 @@
 # coding=utf-8
-import PackageTool
+# import PackageTool
 from tax.taxplayer_download import TaxplayerDownload
 from tax.Mysql_Config_Fyh import logger
 from tax.Mysql_Config_Fyh import data_to_mysql
