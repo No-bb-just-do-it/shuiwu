@@ -28,7 +28,7 @@ class JiangSu(TaxConfig):
     #江苏省税务局欠税信息
     def qs_abnormal_province(self):
         # url_host = 'http://www.ah-n-tax.gov.cn'
-        url_host = 'http://www.zjtax.gov.cn'
+        url_host = 'http://www.jsgs.gov.cn'
         headers = {
         'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
         'Accept-Encoding': 'gzip, deflate',
@@ -131,6 +131,8 @@ class JiangSu(TaxConfig):
         if '欠' in titleText or '缴' in titleText or '非正常户' in titleText or '失踪' in titleText:
             # url_detail = 'http://www.hhgtax.gov.cn/hhgtax/article_content_xxgk.jsp?id=20181106283800&smallclassid=20180629130174'
             r_inner = self.get(url_detail)
+            print('titleText ',titleText)
+            print('url_detail:',url_detail)
             if not r_inner:
                 return
             charset1 = chardet.detect(r_inner.content)['encoding']

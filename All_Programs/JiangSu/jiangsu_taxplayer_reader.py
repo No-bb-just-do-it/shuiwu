@@ -9,11 +9,11 @@ import re
 import traceback
 
 
-class ZheJiangTaxplayerReader(TaxplayerReader):
+class JiangSuTaxplayerReader(TaxplayerReader):
     def __init__(self):
-        super(ZheJiangTaxplayerReader, self).__init__()
-        self.province = '浙江省'
-        self.province_py = 'ZheJiang'
+        super(JiangSuTaxplayerReader, self).__init__()
+        self.province = '江苏省'
+        self.province_py = 'JiangSu'
         self.set_config()
         # self.today = "'%2017-11-29%'"
 
@@ -651,13 +651,13 @@ class ZheJiangTaxplayerReader(TaxplayerReader):
 
 
 if __name__ == '__main__':
-    reader = ZheJiangTaxplayerReader()
+    reader = JiangSuTaxplayerReader()
     reader.word_to_html()
     # reader.get_abnormal_excel_fieldnames()
     # reader.get_abnormal_html_fieldnames()
     # reader.get_qsgg_excel_fieldnames()
     # reader.get_qsgg_html_fieldnames()
-    # reader.abnormal_excel_reader()
-    # reader.abnormal_html_reader()
+    reader.abnormal_excel_reader()
+    reader.abnormal_html_reader()
     reader.qsgg_excel_reader()
-    # reader.qsgg_html_reader()
+    reader.qsgg_html_reader()

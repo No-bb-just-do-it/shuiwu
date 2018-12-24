@@ -71,6 +71,7 @@ class TaxConfig(SpiderMan):
                 f.write(write_time + '    ' + message + '\n')
 
     def save_to_mysql(self, sql, log_name = None,lock = None):
+        lock = None
         try:
             # print(sql)
             if lock:

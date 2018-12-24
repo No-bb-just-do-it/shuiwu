@@ -952,9 +952,9 @@ class TaxplayerReader(object):
             except UnicodeDecodeError:
                 htmlfile.close()
                 htmlfile = open(filepath, 'rb')
-                print('333')
+                # print('333')
                 htmlpage = htmlfile.read()
-                print('444')
+                # print('444')
             soup = BeautifulSoup(htmlpage, "html.parser")  # 实例化一个BeautifulSoup对象
             htmlfile.close()
             return soup
