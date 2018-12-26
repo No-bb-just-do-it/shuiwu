@@ -98,7 +98,7 @@ class GuangDong(TaxConfig):
 
 
 
-    def qs_province(self,page=1):
+    def qs_province(self,page=600):
 
         requests.get('http://www.gd-n-tax.gov.cn/gdsw/qsgg/common_tt.shtml')
         self.session = requests.session()
