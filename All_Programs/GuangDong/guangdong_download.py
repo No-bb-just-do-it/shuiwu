@@ -33,19 +33,11 @@ class GuangDong(TaxConfig):
     def log(self,message):
         self.log_base(self.log_name,message)
 
-    def qs_province(self):
-
-        rs = requests.get('http://www.gd-n-tax.gov.cn/gdsw/qsgg/common_tt.shtml')
-        session = requests.session()
-        # print(requests.session())
-        # print(r.content)
-        a = datetime.datetime.now().strftime('%a %b %d %Y %H:%M:%S')
-        a +=' GMT 0800 (中国标准时间)'
-        params = {
-            'dt':a,
-        }
-        # print(a)
-        r = session.get('http://www.gd-n-tax.gov.cn/siteapps/webpage/gdtax/qsgg/image_code.jsp',params=a)
+    def down_image(self):
+        timeNow = datetime.datetime.now().strftime('%a %b %d %Y %H:%M:%S')
+        timeNow +=' GMT 0800 (中国标准时间)'
+        params = {'dt':timeNow}
+        r = self.session.get('http://www.gd-n-tax.gov.cn/siteapps/webpage/gdtax/qsgg/image_code.jsp',params=timeNow)
         fp = os.getcwd()
         savePath = os.path.join(fp,'../../All_Files/image_guangdong/img.png')
         with open(savePath, 'wb') as f:
@@ -54,29 +46,59 @@ class GuangDong(TaxConfig):
                     f.write(chunk)
                     f.flush()
             f.close()
-        img = Image.open(savePath)
-        s = pytesseract.image_to_string(img)
-        print(s)
-        if not s.isdigit() or len(s) != 4:
-            self.qs_province()
-        for i in range(1,31454):
-            if i % 10 == 0:
-                print('page:',i)
+        return savePath
+
+    #识别验证码
+    def recognition_img(self):
+        savePath = self.down_image()
+        try:
+            img = Image.open(savePath)
+        except:
+            self.recognition_img()
+        captcha = pytesseract.image_to_string(img)
+        print('captcha:',captcha)
+        if not captcha.isdigit() or len(captcha) != 4:
+            self.recognition_img()
+        return captcha
+
+
+
+    #获取列表页
+    def get_tags(self,captcha=None,page=None):
+        params = {
+            'maxPage': 31454,
+            'no_first_yzm': 0,
+            'no_init_flag': 1,
+            # 'status': 1,
+            'yzm': captcha,
+            'pagination_input': page,
+        }
+        r = self.session.post('http://www.gd-n-tax.gov.cn/siteapps/webpage/gdtax/qsgg/qsgg_search_list.jsp', params=params)
+        res = BeautifulSoup(r.content, 'html.parser')
+        trs = res.find_all('tr')[1:]
+        # print(len(trs))
+        # for tr in trs:
+        #     print(tr)
+        if len(trs) != 10:
+            print('len_trs:',len(trs))
+        if len(trs) == 0:
+            print('wrong_trs:', len(trs))
+            print('wrong_page:',page)
+            captcha = self.recognition_img()
+            trs = self.get_tags(captcha)
+        return trs
+
+    def qs_province(self):
+
+        requests.get('http://www.gd-n-tax.gov.cn/gdsw/qsgg/common_tt.shtml')
+        self.session = requests.session()
+        captcha = self.recognition_img()
+        # for p in range(3840,31454):
+        for p in range(1,31454):
+            if p % 10 == 0:
+                print('page:',p)
             last_update_time = time.strftime('%Y-%m-%d %H:%M:%S')
-            params = {
-                'maxPage': 0,
-                'no_first_yzm': 1,
-                'no_init_flag': 1,
-                'status': 1,
-                'yzm': s,
-                'pagination_input': i,
-            }
-            r = session.post('http://www.gd-n-tax.gov.cn/siteapps/webpage/gdtax/qsgg/qsgg_search_list.jsp',params=params)
-            res = BeautifulSoup(r.content,'html.parser')
-            trs = res.find_all('tr')[1:]
-            # print(len(trs))
-            if len(trs) != 10:
-                print('trs:',len(trs))
+            trs = self.get_tags(captcha,p)
             for tr in trs:
                 tds = tr.find_all('td')
                 # print(tds[0].find('a').get('href'))
@@ -89,6 +111,7 @@ class GuangDong(TaxConfig):
                 # for td in tds:
                 #     print(td.text)
                 sql = "insert into taxplayer_qsgg (province,nsrmc,nsrsbh,fddbr,qsje,fbrq,last_update_time) values ('%s','%s','%s','%s','%s','%s','%s')" % (self.province,nsrmc,nsrsbh,fddbr,qsje,fbrq,last_update_time)
+                # print(sql)
                 # print(sql)
                 self.save_to_mysql(sql,log_name=self.log_name)
                 # print(tr)
