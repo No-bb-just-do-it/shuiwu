@@ -89,6 +89,7 @@ class GuangDong(TaxConfig):
                 trs = self.get_tags(captcha)
         except Exception as e:
             print(e)
+            time.sleep(5)
             requests.get('http://www.gd-n-tax.gov.cn/gdsw/qsgg/common_tt.shtml')
             self.session = requests.session()
             captcha = self.recognition_img()
