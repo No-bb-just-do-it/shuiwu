@@ -10,6 +10,7 @@ import chardet
 from threading import Lock
 import traceback
 import sys
+from peewee import *
 
 class TaxConfig(SpiderMan):
     def __init__(self):
