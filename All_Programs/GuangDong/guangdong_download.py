@@ -37,7 +37,7 @@ class GuangDong(TaxConfig):
         timeNow = datetime.datetime.now().strftime('%a %b %d %Y %H:%M:%S')
         timeNow +=' GMT 0800 (中国标准时间)'
         params = {'dt':timeNow}
-        r = self.session.get('http://www.gd-n-tax.gov.cn/siteapps/webpage/gdtax/qsgg/image_code.jsp',params=timeNow)
+        r = self.session.get('http://www.gd-n-tax.gov.cn/siteapps/webpage/gdtax/qsgg/image_code.jsp',params=params)
         fp = os.getcwd()
         savePath = os.path.join(fp,'../../All_Files/image_guangdong/img.png')
         with open(savePath, 'wb') as f:
