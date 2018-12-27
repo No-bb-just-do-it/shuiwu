@@ -29,6 +29,7 @@ class SpiderMan(object):
     def get(self, url, **kwargs):
         # print('session,',self.session)
         for t in range(self.max_try_times):
+            # print('try_num:',t)
             proxy_config = self.get_proxy()
 
             kwargs['proxies'] = {'http': 'http://%(user)d:%(pwd)s@%(proxy)s' % proxy_config,

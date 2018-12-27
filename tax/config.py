@@ -109,10 +109,13 @@ class TaxConfig(SpiderMan):
     def get_html_filename(self, url_detail):
         html_filename = url_detail.split('/')[-1]
         if '=' in url_detail:
-            if '.htm' not in url_detail:
-                html_filename = html_filename.split('=')[-1] + '.html'
-            else:
-                html_filename = html_filename.split('=')[-1]
+            # if '.htm' not in url_detail:
+            #     html_filename = html_filename.split('=')[-1] + '.html'
+            # else:
+            #     html_filename = html_filename.split('=')[-1]
+            html_filename = html_filename.split('=')[-1]
+        if not html_filename.endswith('.htm') or not html_filename.endswith(''):
+            html_filename += '.html'
         return html_filename
 
      # 判断链接列表中需要下载的文件的链接，返回链接列表
