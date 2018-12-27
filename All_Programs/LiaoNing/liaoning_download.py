@@ -288,7 +288,7 @@ class LiaoNing(TaxConfig):
 if __name__ == '__main__':
     liaoning = LiaoNing()
     liaoning.qs_abnormal_province()
-    # liaoning.qs_abnormal_dalian()
+    liaoning.qs_abnormal_dalian()
     # s='location.href = "http://www.dl-n-tax.gov.cn/art/2018/8/6/art_1792_102463.html";'
     # a = re.findall(r'location.href = "(.*)";',s)
     # print(a)
