@@ -218,9 +218,9 @@ class LiaoNing(TaxConfig):
             if region == 'dalian':
                 r = BeautifulSoup(r_detail.text, 'html.parser')
                 # print(r.contents)
-                url_detail = re.findall(r'location.href = "(.*)";', str(r.contents))
-                print('new_detail:',url_detail[0])
-                r_detail  = self.get(url_detail[0])
+                url_detail = re.findall(r'location.href = "(.*)";', str(r.contents))[0]
+                print('new_detail:',url_detail)
+                r_detail  = self.get(url_detail)
 
 
             # print('new_url:',r_detail)
@@ -277,16 +277,26 @@ class LiaoNing(TaxConfig):
 
                     self.save_to_mysql(sql,self.log_name,lock)
                 else:
+                    self.save_to_mysql(sql,self.log_name,lock=lock)
                     # self.log('url_detail_down_html: ' + url_detail)
                     print('url_detail_html ',url_detail)
-                    with open(html_savepath, 'w',encoding='utf8') as f:
-                        # print(r_detail.content.decode('gbk'))
-                        if charset1:
-                            f.write(r_detail.content.decode(charset1,'ignore'))
-                        else:
-                            f.write(r_detail.content)
+                    try:
+                        with open(html_savepath, 'w',encoding='utf8') as f:
+                            # print(r_detail.content.decode('gbk'))
+                            if charset1:
+                                f.write(r_detail.content.decode(charset1,'ignore'))
+                            else:
+                                f.write(r_detail.content)
+                    except Exception as e:
+                        print(e)
+                        with open(html_savepath, 'wb') as f:
+                            # print(r_detail.content.decode('gbk'))
+                            if charset1:
+                                f.write(r_detail.content.decode(charset1, 'ignore'))
+                            else:
+                                f.write(r_detail.content)
 
-                    self.save_to_mysql(sql,self.log_name,lock=lock)
+
 
 if __name__ == '__main__':
     liaoning = LiaoNing()

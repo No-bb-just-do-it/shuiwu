@@ -94,10 +94,10 @@ class TaxConfig(SpiderMan):
             self.log_base(log_name,sql)
             self.log_base(log_name,e)
             # print(e.args)
-            if e.args[0] == 2006:
+            if e.args[0] == 2006 or e.args[0]:
                 time.sleep(2)
-                self.save_to_mysql(sql)
-            if e.args[0] != 1062:
+                self.save_to_mysql(sql,log_name=log_name)
+            elif e.args[0] != 1062:
                 print(e.args[0])
                 # exType, exValue, exTrace = sys.exc_info()
                 # print(exType, exValue, sep="\n")
