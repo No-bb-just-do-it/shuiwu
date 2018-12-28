@@ -120,7 +120,6 @@ class TaxConfig(SpiderMan):
 
      # 判断链接列表中需要下载的文件的链接，返回链接列表
     def get_href(self, a_tag_list):
-
         href_list = []
         for a_tag in a_tag_list:
             soup = BeautifulSoup(a_tag, "html.parser")
@@ -129,9 +128,6 @@ class TaxConfig(SpiderMan):
             file_condition = True in [file_format in href for file_format in file_formats]
             if file_condition and 'javascript' not in href:
                 href_list.append(href)
-
-
-
         return href_list
 
     def log_base(self,log_name, message):
