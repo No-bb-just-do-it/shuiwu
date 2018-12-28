@@ -124,6 +124,7 @@ class TaxConfig(SpiderMan):
 
 
 
+
         href_list = []
         for a_tag in a_tag_list:
             soup = BeautifulSoup(a_tag, "html.parser")
