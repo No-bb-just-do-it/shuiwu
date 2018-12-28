@@ -277,7 +277,6 @@ class LiaoNing(TaxConfig):
 
                     self.save_to_mysql(sql,self.log_name,lock)
                 else:
-                    self.save_to_mysql(sql,self.log_name,lock=lock)
                     # self.log('url_detail_down_html: ' + url_detail)
                     print('url_detail_html ',url_detail)
                     try:
@@ -295,6 +294,7 @@ class LiaoNing(TaxConfig):
                                 f.write(r_detail.content.decode(charset1, 'ignore'))
                             else:
                                 f.write(r_detail.content)
+                    self.save_to_mysql(sql,self.log_name,lock=lock)
 
 
 
