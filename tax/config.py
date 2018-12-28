@@ -128,7 +128,7 @@ class TaxConfig(SpiderMan):
             file_condition = True in [file_format in href for file_format in file_formats]
             if file_condition and 'javascript' not in href:
                 href_list.append(href)
-                
+
         return href_list
 
     def log_base(self,log_name, message):
