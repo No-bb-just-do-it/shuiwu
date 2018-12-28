@@ -281,7 +281,10 @@ class LiaoNing(TaxConfig):
                     print('url_detail_html ',url_detail)
                     with open(html_savepath, 'w',encoding='utf8') as f:
                         # print(r_detail.content.decode('gbk'))
-                        f.write(r_detail.content.decode(charset1,'ignore'))
+                        if charset1:
+                            f.write(r_detail.content.decode(charset1,'ignore'))
+                        else:
+                            f.write(r_detail.content)
 
                     self.save_to_mysql(sql,self.log_name,lock=lock)
 
