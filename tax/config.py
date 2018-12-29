@@ -114,7 +114,7 @@ class TaxConfig(SpiderMan):
             # else:
             #     html_filename = html_filename.split('=')[-1]
             html_filename = html_filename.split('=')[-1]
-        if not html_filename.endswith('.htm') or not html_filename.endswith(''):
+        if (not html_filename.endswith('.htm')) and (not html_filename.endswith('.html')):
             html_filename += '.html'
         return html_filename
 
@@ -199,7 +199,7 @@ class TaxConfig(SpiderMan):
         print(sql1)
         self.cursor.execute(sql1)
         infos = self.cursor.fetchall()
-        print(len(infos))
+        print('wrong_mysql:',len(infos))
         result = re.compile('[\u4e00-\u9fa5]')
         n = 0
         for info in infos:
@@ -207,7 +207,7 @@ class TaxConfig(SpiderMan):
             if match:
                 sql2 = "update taxplayer_qsgg set nsrsbh = '%s', nsrmc = '%s' where nsrsbh='%s' and nsrmc='%s' and last_update_time > '%s'" % (info[1],info[0],info[0],info[1],date_today)
                 self.cursor.execute(sql2)
-                print(sql2)
+                # print(sql2)
                 n += 1
                 print(info)
 
