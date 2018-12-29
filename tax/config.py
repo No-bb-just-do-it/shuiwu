@@ -190,3 +190,30 @@ class TaxConfig(SpiderMan):
 
                 # else:
                 #     print(u'第' + str(k) + u'次下载请求')
+
+    #纳税人识别号与纳税人名称顺序错误更改
+    def check_mysql(self):
+        date_today = time.strftime('%Y-%m-%d')
+        print(date_today)
+        sql1 = "select nsrsbh,nsrmc from taxplayer_qsgg where last_update_time > '%s'" % (date_today)
+        print(sql1)
+        self.cursor.execute(sql1)
+        infos = self.cursor.fetchall()
+        print(len(infos))
+        result = re.compile('[\u4e00-\u9fa5]')
+        n = 0
+        for info in infos:
+            match = result.search(info[0])
+            if match:
+                sql2 = "update taxplayer_qsgg set nsrsbh = '%s', nsrmc = '%s' where nsrsbh='%s' and nsrmc='%s' and last_update_time > '%s'" % (info[1],info[0],info[0],info[1],date_today)
+                self.cursor.execute(sql2)
+                print(sql2)
+                n += 1
+                print(info)
+
+        print('n:',n)
+        # print(infos)
+
+if __name__ == '__main__':
+    t = TaxConfig()
+    t.check_mysql()
