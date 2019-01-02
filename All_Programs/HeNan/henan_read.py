@@ -9,11 +9,11 @@ import re
 import traceback
 
 
-class HeiLongJiangTaxplayerReader(TaxplayerReader):
+class HeNanTaxplayerReader(TaxplayerReader):
     def __init__(self):
-        super(HeiLongJiangTaxplayerReader, self).__init__()
-        self.province = '黑龙江省'
-        self.province_py = 'HeiLongJiang'
+        super(HeNanTaxplayerReader, self).__init__()
+        self.province = '河南省'
+        self.province_py = 'HeNan'
         self.set_config()
         # self.today = "'%2017-11-29%'"
 
@@ -251,6 +251,7 @@ class HeiLongJiangTaxplayerReader(TaxplayerReader):
         info = self.get_province_info(sql)
         num_sql_all, num_repetition_all, num_fail_all = 0, 0, 0
         for num_info in range(0, len(info)):
+            # print(info[num_info])
             num_sql, num_repetition, num_fail = 0, 0, 0
             region = info[num_info][1]
             fbrq = info[num_info][2]
@@ -651,13 +652,13 @@ class HeiLongJiangTaxplayerReader(TaxplayerReader):
 
 
 if __name__ == '__main__':
-    reader = HeiLongJiangTaxplayerReader()
-    reader.word_to_html()
+    reader = HeNanTaxplayerReader()
+    # reader.word_to_html()
     # reader.get_abnormal_excel_fieldnames()
     # reader.get_abnormal_html_fieldnames()
     # reader.get_qsgg_excel_fieldnames()
     # reader.get_qsgg_html_fieldnames()
-    reader.abnormal_excel_reader()
-    reader.abnormal_html_reader()
+    # reader.abnormal_excel_reader()
+    # reader.abnormal_html_reader()
     reader.qsgg_excel_reader()
-    reader.qsgg_html_reader()
+    # reader.qsgg_html_reader()
