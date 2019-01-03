@@ -255,9 +255,9 @@ class HaiNanTaxplayerReader(TaxplayerReader):
             region = info[num_info][1]
             fbrq = info[num_info][2]
             if '.xls' in info[num_info][4]:
-                filepath = self.path + info[num_info][4]
+                filepath = os.path.join(self.path, info[num_info][4])
             else:
-                filepath = self.path + info[num_info][4].split('.')[0] + '.xls'
+                filepath = os.path.join(self.path, info[num_info][4].split('.')[0] + '.xls')
             try:
                 excel = self.get_excel(filepath)
                 sheets = excel.sheets()
@@ -656,7 +656,7 @@ if __name__ == '__main__':
     # reader.get_abnormal_html_fieldnames()
     # reader.get_qsgg_excel_fieldnames()
     # reader.get_qsgg_html_fieldnames()
-    # reader.abnormal_excel_reader()
-    # reader.abnormal_html_reader()
+    reader.abnormal_excel_reader()
+    reader.abnormal_html_reader()
     reader.qsgg_excel_reader()
-    # reader.qsgg_html_reader()
+    reader.qsgg_html_reader()

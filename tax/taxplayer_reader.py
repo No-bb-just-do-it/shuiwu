@@ -23,8 +23,8 @@ class TaxplayerReader(object):
         self.abnormal_fields = []
         self.qs_fields = []
         # self.today = "'%2017-09-08%'"
-        self.today = "'%" + time.strftime('%Y-%m-%d') + "%'"
-        # self.today = "'%2018-12%'"
+        # self.today = "'%" + time.strftime('%Y-%m-%d') + "%'"
+        self.today = "'%2019-01%'"
         self.last_update_time = time.strftime('%Y-%m-%d %H:%M:%S')
         self.fieldnames_directory = self.get_fieldnames_directory()
         self.row = -1
