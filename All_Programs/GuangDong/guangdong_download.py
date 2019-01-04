@@ -39,7 +39,9 @@ class GuangDong(TaxConfig):
         params = {'dt':timeNow}
         r = self.session.get('http://www.gd-n-tax.gov.cn/siteapps/webpage/gdtax/qsgg/image_code.jsp',params=params)
         fp = os.getcwd()
-        savePath = os.path.join(fp,'../../All_Files/image_guangdong/img.png')
+        saveFile = os.path.join(fp,'../../All_Files/image_captcha')
+        savePath = os.path.join(saveFile ,'img.png')
+        os.makedirs(saveFile,exist_ok=True)
         with open(savePath, 'wb') as f:
             for chunk in r.iter_content(chunk_size=1024):
                 if chunk:  # filter out keep-alive new chunks
@@ -135,4 +137,6 @@ class GuangDong(TaxConfig):
 
 if __name__ == '__main__':
     guangdong = GuangDong()
-    guangdong.qs_province()
+    # guangdong.qs_province()
+
+    guangdong.recognition_img()

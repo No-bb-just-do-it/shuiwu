@@ -12,6 +12,9 @@ import gevent,gevent.monkey
 from codecs import open
 import chardet
 from urllib.parse import urljoin
+import pytesseract
+from PIL import Image
+import json
 import threading
 lock = threading.Lock()
 
@@ -23,7 +26,7 @@ class HaiNan(TaxConfig):
         self.log_name = 'HaiNan.log'
         self.path = self.get_savefile_directory('HaiNan')
         self.url_host = 'http://www.hitax.gov.cn'
-
+        self.p_before = 0
     def log(self,message):
         self.log_base(self.log_name,message)
 
@@ -159,7 +162,95 @@ class HaiNan(TaxConfig):
 
                     self.save_to_mysql(sql,self.log_name,lock=lock)
 
+    #海南直接入库欠税页面爬虫
+    def qs_zjrk(self,page=1,p_before=1,num_retry=0):
+        requests.get('http://www.hitax.gov.cn/bsfw_5_3/')
+        self.session = requests.session()
+        # requests.get('http://www.hitax.gov.cn/captcha.svl')
+        try:
+            for p in range(page,600):
+                print('@'*100)
+                # print('page:',p)
+                if p % 10 == 0:
+                    print('page:',p)
+                last_update_time = time.strftime('%Y-%m-%d %H:%M:%S')
+                captcha = self.recognition_img()
+                data = {
+                    'name':'',
+                    'id':'',
+                    'pageNo': p,
+                    'captcha': captcha,
+                }
+                # if p == 1:
+                # r = self.session.post('http://www.hitax.gov.cn/bsfw_5_3/',data=data)
+                # else:
+                r = self.session.post('http://www.hitax.gov.cn/bsfw_5_3.json',data=data)
+                # res = json.loads(r.content)
+                res = BeautifulSoup(r.content,'html.parser')
+                # print(res)
+                table = res.find(attrs={'class':'list_table'})
+                titles = table.find_all('tr')
+                #
+                print('len_titles:',len(titles))
+                for title in titles:
+                    tds = title.find_all('td')
+                    nsrsbh = tds[0].text.strip()
+                    nsrmc = tds[1].text.strip()
+                    qsje = tds[2].text.strip()
+                    fbrq = tds[3].text.strip()
+                    # print(title)
+                    sql = "insert into taxplayer_qsgg (province,nsrmc,nsrsbh,qsje,fbrq,last_update_time) values ('%s','%s','%s','%s','%s','%s')" % (self.province,nsrmc,nsrsbh,qsje,fbrq,last_update_time)
+                    # print(sql)
+                    self.save_to_mysql(sql,log_name=self.log_name)
+        except Exception as e:
+            print('wrong_page:',page)
+            print(e)
+            if p == p_before:
+                num_retry += 1
+            p_before = p
+            if num_retry > 5:
+                p += 1
+                num_retry = 0
+            self.qs_zjrk(p,p_before=p_before,num_retry=num_retry)
+
+
+    def down_image(self):
+        timeNow = datetime.datetime.now().strftime('%a %b %d %Y %H:%M:%S')
+        timeNow +=' GMT 0800 (中国标准时间)'
+        # print(timeNow)
+        params = {timeNow:''}
+        r = self.session.get('http://www.hitax.gov.cn/captcha.svl',params=params)
+        fp = os.getcwd()
+        saveFile = os.path.join(fp,'../../All_Files/image_captcha')
+        savePath = os.path.join(saveFile ,'captcha.jpeg')
+        os.makedirs(saveFile,exist_ok=True)
+        with open(savePath, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=1024):
+                if chunk:  # filter out keep-alive new chunks
+                    f.write(chunk)
+                    f.flush()
+            f.close()
+        return savePath
+
+    #识别验证码
+    def recognition_img(self):
+        # fp = os.getcwd()
+        # saveFile = os.path.join(fp,'../../All_Files/image_guangdong')
+        # savePath = os.path.join(saveFile ,'captcha.jpeg')
+        savePath = self.down_image()
+        # print('savepath:',savePath)
+        try:
+            img = Image.open(savePath)
+        except:
+            self.recognition_img()
+        captcha = pytesseract.image_to_string(img)
+        print('captcha:',captcha)
+        # if not captcha.isdigit() or len(captcha) != 4:
+        #     self.recognition_img()
+        return captcha
+
 
 if __name__ == '__main__':
     hainan = HaiNan()
-    hainan.qs_abnormal_province()
+    # hainan.qs_abnormal_province()
+    hainan.qs_zjrk()
