@@ -7,8 +7,8 @@ import time
 
 class SpiderMan(object):
     session = None
-    manager_host = '118.190.114.196'
-    manager_port = 8080
+    manager_host = '12313'
+    manager_port = 12323
     order = None
 
     def __init__(self, order='38c7e5f5-59a1-11e7-bda9-f45c89a63279', keep_session=True, keep_ip=False, max_try_times=15):
