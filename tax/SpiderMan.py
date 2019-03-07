@@ -8,8 +8,8 @@ from tax.MyException import StatusCodeException
 class SpiderMan(object):
 
     session = None
-    manager_host = '118.190.114.196'
-    manager_port = 8080
+    manager_host = ''
+    manager_port = 123123
     order = None
 
     def __init__(self, order='5fe6cf97-5592-11e7-be16-f45c89a63279', keep_session=True, keep_ip=False, max_try_times=5,headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:45.0) Gecko/20100101 Firefox/45.0'}):
